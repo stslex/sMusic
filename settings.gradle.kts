@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "sMusic"
 include(":app")
- 
+include(":core:ui")

@@ -1,20 +1,17 @@
 plugins {
-    alias(libs.plugins.com.android.application)
+    alias(libs.plugins.com.android.library)
     alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
-    namespace = "com.stslex.smusic"
+    namespace = "com.stslex.core.ui"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.stslex.smusic"
         minSdk = 28
-        targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -44,5 +41,22 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:ui"))
+    /*Compose*/
+    val composeBom = platform(libs.compose.bom)
+    api(composeBom)
+    androidTestApi(composeBom)
+
+    api(libs.bundles.compose)
+    debugApi(libs.compose.ui.tooling)
+
+    api(libs.bundles.accompanist)
+
+    /*Default*/
+    api(libs.core.ktx)
+    api(libs.appcompat)
+    api(libs.material)
+
+    testApi(libs.junit)
+    androidTestApi(libs.androidx.test.ext.junit)
+    androidTestApi(libs.espresso.core)
 }
