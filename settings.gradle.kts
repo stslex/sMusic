@@ -15,4 +15,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "sMusic"
 include(":app")
- 
+include(":core:ui")
+include(":feature:settings")
+include(":core:navigation")
+include(":feature:home")
