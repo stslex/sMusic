@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import com.stslex.core.navigation.NavDestination
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.feature.home.ui.HomeScreen
+import org.koin.androidx.compose.koinViewModel
 
 fun NavGraphBuilder.homeGraph(
     modifier: Modifier = Modifier,
@@ -14,7 +15,8 @@ fun NavGraphBuilder.homeGraph(
     composable(route = NavDestination.HOME.route) {
         HomeScreen(
             modifier = modifier,
-            navigate = navigate
+            navigate = navigate,
+            viewModel = koinViewModel()
         )
     }
 }

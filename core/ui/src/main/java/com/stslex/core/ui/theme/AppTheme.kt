@@ -1,4 +1,4 @@
-package com.stslex.smusic.theme
+package com.stslex.core.ui.theme
 
 import android.content.Context
 import android.os.Build

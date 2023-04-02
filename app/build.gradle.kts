@@ -1,8 +1,6 @@
 plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
-    alias(libs.plugins.com.google.hilt)
-    kotlin("kapt")
 }
 
 android {
@@ -41,24 +39,18 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.2"
     }
-    kapt {
-        correctErrorTypes = true
-    }
-    kotlin {
-        jvmToolchain(11)
-    }
 }
 
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:navigation"))
+    implementation(project(":core:datastore"))
+    implementation(project(":core:network"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:home"))
 
+    implementation(libs.bundles.koin)
     implementation(libs.androidx.activity.ktx)
-    implementation(libs.bundles.hilt)
-    kapt(libs.hilt.android.compiler)
-
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore)
 }

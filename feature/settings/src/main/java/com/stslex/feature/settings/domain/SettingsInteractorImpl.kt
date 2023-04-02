@@ -1,11 +1,10 @@
 package com.stslex.feature.settings.domain
 
-import com.stslex.feature.settings.data.repository.SettingsDbModel
+import com.stslex.core.datastore.SettingsDbModel
 import com.stslex.feature.settings.data.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-class SettingsInteractorImpl @Inject constructor(
+class SettingsInteractorImpl(
     private val repository: SettingsRepository
 ) : SettingsInteractor {
 
