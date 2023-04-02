@@ -31,9 +31,7 @@ class MainActivity : AppCompatActivity() {
             val systemUiController = rememberSystemUiController()
             val navHostController = rememberNavController()
 
-            val settingsValue by remember(viewModel) {
-                viewModel.settings
-            }.collectAsState()
+            val settingsValue by remember(viewModel) { viewModel.settings }.collectAsState()
 
             val isDarkTheme by remember {
                 derivedStateOf {
@@ -48,9 +46,7 @@ class MainActivity : AppCompatActivity() {
             AppTheme(
                 isDarkTheme = isDarkTheme
             ) {
-                systemUiController.setSystemBarsColor(
-                    color = animatedBackground().value
-                )
+                systemUiController.setSystemBarsColor(color = animatedBackground().value)
 
                 MainScreen(navHostController = navHostController)
             }
