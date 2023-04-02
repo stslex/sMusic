@@ -4,11 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -24,6 +24,7 @@ import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.ui.extensions.animatedBackground
 import com.stslex.core.ui.extensions.animatedColor
 import com.stslex.core.ui.extensions.animatedOnBackground
+import com.stslex.feature.settings.data.repository.SettingsDbModel
 
 @Composable
 fun SettingsScreen(
@@ -40,52 +41,70 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(color = animatedBackground().value)
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
                     horizontal = 16.dp
                 )
         ) {
-            SettingsColumnTitle(text = "Theme")
-            Spacer(modifier = Modifier.padding(8.dp))
-            SettingsItemSwitch(
-                title = "system",
-                isChecked = settings.isSystemThemeEnable,
-                onCheckedChange = { isChecked ->
-                    viewModel.updateSystemTheme(
-                        settings.copy(isSystemThemeEnable = isChecked)
-                    )
-                }
-            )
 
-            SettingsItemSwitch(
-                title = "dark",
-                isChecked = settings.isDarkTheme,
-                onCheckedChange = { isChecked ->
-                    viewModel.updateDarkTheme(
-                        settings.copy(isDarkTheme = isChecked)
-                    )
-                },
-                isEnable = settings.isSystemThemeEnable.not()
-            )
-
-            Divider(
-                modifier = Modifier.padding(vertical = 16.dp),
-                color = MaterialTheme.colorScheme.outlineVariant.animatedColor().value
-            )
+            item {
+                SettingsItemTheme(
+                    settings = settings,
+                    updateSettings = viewModel::updateSettings
+                )
+            }
+            item {
+                Divider(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.animatedColor().value
+                )
+            }
         }
     }
 }
 
 @Composable
-fun ColumnScope.SettingsColumnTitle(
+fun SettingsItemTheme(
+    modifier: Modifier = Modifier,
+    settings: SettingsDbModel,
+    updateSettings: (SettingsDbModel) -> Unit
+) {
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        SettingsColumnTitle(text = "Theme")
+        Spacer(modifier = Modifier.padding(16.dp))
+        SettingsItemSwitch(
+            title = "system",
+            isChecked = settings.isSystemThemeEnable,
+            onCheckedChange = { isChecked ->
+                updateSettings(
+                    settings.copy(isSystemThemeEnable = isChecked)
+                )
+            }
+        )
+        SettingsItemSwitch(
+            title = "dark",
+            isChecked = settings.isDarkTheme,
+            onCheckedChange = { isChecked ->
+                updateSettings(
+                    settings.copy(isDarkTheme = isChecked)
+                )
+            },
+            isEnable = settings.isSystemThemeEnable.not()
+        )
+    }
+}
+
+@Composable
+fun SettingsColumnTitle(
     modifier: Modifier = Modifier,
     text: String
 ) {
     Text(
-        modifier = modifier
-            .align(Alignment.Start),
+        modifier = modifier,
         text = text,
         style = MaterialTheme.typography.headlineMedium,
         color = animatedOnBackground().value

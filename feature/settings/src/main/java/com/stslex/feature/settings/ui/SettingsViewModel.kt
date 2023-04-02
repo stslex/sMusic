@@ -27,13 +27,7 @@ class SettingsViewModel @Inject constructor(
                 initialValue = SettingsDbModel()
             )
 
-    fun updateSystemTheme(currentSettings: SettingsDbModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            interactor.updateSettings(currentSettings)
-        }
-    }
-
-    fun updateDarkTheme(currentSettings: SettingsDbModel) {
+    fun updateSettings(currentSettings: SettingsDbModel) {
         viewModelScope.launch(Dispatchers.IO) {
             interactor.updateSettings(currentSettings)
         }
