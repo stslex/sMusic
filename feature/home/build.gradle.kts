@@ -1,8 +1,7 @@
 plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.org.jetbrains.kotlin.android)
-    alias(libs.plugins.com.google.hilt)
-    kotlin("kapt")
+    kotlin("plugin.serialization") version "1.8.10"
 }
 
 android {
@@ -38,18 +37,16 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.2"
     }
-    kapt {
-        correctErrorTypes = true
-    }
-    kotlin {
-        jvmToolchain(11)
-    }
 }
 
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:navigation"))
+    implementation(project(":core:network"))
 
-    implementation(libs.bundles.hilt)
-    kapt(libs.hilt.android.compiler)
+    implementation(libs.bundles.koin)
+    implementation(libs.bundles.ktor)
+
+    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation("androidx.compose.ui:ui-util:1.4.0")
 }

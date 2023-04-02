@@ -2,19 +2,16 @@ package com.stslex.feature.settings.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.stslex.feature.settings.data.repository.SettingsDbModel
+import com.stslex.core.datastore.SettingsDbModel
 import com.stslex.feature.settings.domain.SettingsInteractor
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class SettingsViewModel @Inject constructor(
+class SettingsViewModel(
     private val interactor: SettingsInteractor
 ) : ViewModel() {
 

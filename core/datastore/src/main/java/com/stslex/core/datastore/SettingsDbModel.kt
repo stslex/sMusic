@@ -1,4 +1,4 @@
-package com.stslex.feature.settings.data.repository
+package com.stslex.core.datastore
 
 data class SettingsDbModel(
     val isSystemThemeEnable: Boolean = true,
