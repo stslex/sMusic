@@ -4,18 +4,15 @@ import com.stslex.feature.settings.data.repository.SettingsRepository
 import com.stslex.feature.settings.data.repository.SettingsRepositoryImpl
 import com.stslex.feature.settings.domain.SettingsInteractor
 import com.stslex.feature.settings.domain.SettingsInteractorImpl
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import com.stslex.feature.settings.ui.SettingsViewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-interface SettingsModule {
-
-    @Binds
-    fun bindSettingsInteractor(interactor: SettingsInteractorImpl): SettingsInteractor
-
-    @Binds
-    fun bindsSettingsRepository(repository: SettingsRepositoryImpl): SettingsRepository
+val settingsModule = module {
+    viewModelOf(::SettingsViewModel)
+    factoryOf(::SettingsInteractorImpl) { bind<SettingsInteractor>() }
+    singleOf(::SettingsRepositoryImpl) { bind<SettingsRepository>() }
 }

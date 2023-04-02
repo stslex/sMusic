@@ -8,21 +8,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.stslex.core.ui.extensions.animatedBackground
 import com.stslex.smusic.screen.MainScreen
-import com.stslex.smusic.theme.AppTheme
-import dagger.hilt.android.AndroidEntryPoint
+import com.stslex.core.ui.theme.AppTheme
+import org.koin.android.ext.android.inject
 
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: MainActivityViewModel by lazy {
-        ViewModelProvider(this).get()
-    }
+    private val viewModel by inject<MainActivityViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

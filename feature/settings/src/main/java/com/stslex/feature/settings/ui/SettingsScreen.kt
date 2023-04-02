@@ -24,7 +24,7 @@ import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.ui.extensions.animatedBackground
 import com.stslex.core.ui.extensions.animatedColor
 import com.stslex.core.ui.extensions.animatedOnBackground
-import com.stslex.feature.settings.data.repository.SettingsDbModel
+import com.stslex.core.datastore.SettingsDbModel
 
 @Composable
 fun SettingsScreen(
