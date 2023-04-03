@@ -35,14 +35,10 @@ android {
 
 dependencies {
     implementation(libs.bundles.ktor)
-
-    implementation(libs.core.ktx)
+    implementation(libs.bundles.okhttp)
     implementation(libs.bundles.koin)
 
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.1.0")
-    implementation("org.slf4j:slf4j-simple:1.7.9")
-
+    implementation(libs.core.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

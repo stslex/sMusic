@@ -1,12 +1,13 @@
 package com.stslex.core.network.clients
 
-import com.stslex.core.network.data.model.YouTubePage
-import com.stslex.core.network.model.body.NextBody
+import com.stslex.core.network.data.model.page.YoutubePageDataModel
+import com.stslex.core.network.data.model.player.PlayerDataModel
 import kotlinx.coroutines.flow.Flow
 
 interface YoutubeClient {
-    fun makeNextRequest(
-        requestBody: NextBody = NextBody(videoId = "J7p4bzqLvCw")
-    ): Flow<YouTubePage>
+
+    fun makeNextRequest(id: String): Flow<YoutubePageDataModel>
+
+    fun getPlayerData(id: String): Flow<PlayerDataModel>
 }
 

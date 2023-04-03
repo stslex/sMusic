@@ -3,21 +3,21 @@ package com.stslex.core.network.model.response.browse
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Tabs(
+internal data class Tabs(
     val tabs: List<Tab>?
 ) {
     @Serializable
-    data class Tab(
+    internal data class Tab(
         val tabRenderer: TabRenderer?
     ) {
         @Serializable
-        data class TabRenderer(
+        internal data class TabRenderer(
             val content: Content?,
             val title: String?,
             val tabIdentifier: String?,
         ) {
             @Serializable
-            data class Content(
+            internal data class Content(
                 val sectionListRenderer: SectionListRenderer?,
             )
         }

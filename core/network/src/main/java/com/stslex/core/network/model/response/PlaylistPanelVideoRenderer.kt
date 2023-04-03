@@ -3,7 +3,7 @@ package com.stslex.core.network.model.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PlaylistPanelVideoRenderer(
+internal data class PlaylistPanelVideoRenderer(
     val title: Runs?,
     val longBylineText: Runs?,
     val shortBylineText: Runs?,

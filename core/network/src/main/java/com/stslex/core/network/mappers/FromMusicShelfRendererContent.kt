@@ -1,11 +1,11 @@
 package com.stslex.core.network.mappers
 
-import com.stslex.core.network.data.model.Info
-import com.stslex.core.network.data.model.Item
+import com.stslex.core.network.model.data.Info
+import com.stslex.core.network.model.data.Item
 import com.stslex.core.network.model.response.NavigationEndpoint
 import com.stslex.core.network.model.response.browse.MusicShelfRenderer
 
-fun mapToSong(content: MusicShelfRenderer.Content): Item.SongItem? {
+internal fun mapToSong(content: MusicShelfRenderer.Content): Item.SongItem? {
     val (mainRuns, otherRuns) = content.runs
 
     /** Possible configurations:
@@ -41,7 +41,7 @@ fun mapToSong(content: MusicShelfRenderer.Content): Item.SongItem? {
     ).takeIf { it.info?.endpoint?.videoId != null }
 }
 
-fun mapToAlbum(content: MusicShelfRenderer.Content): Item.AlbumItem? {
+internal fun mapToAlbum(content: MusicShelfRenderer.Content): Item.AlbumItem? {
     val (mainRuns, otherRuns) = content.runs
 
     return Item.AlbumItem(
@@ -62,7 +62,7 @@ fun mapToAlbum(content: MusicShelfRenderer.Content): Item.AlbumItem? {
     ).takeIf { it.info?.endpoint?.browseId != null }
 }
 
-fun mapToArtist(content: MusicShelfRenderer.Content): Item.ArtistItem? {
+internal fun mapToArtist(content: MusicShelfRenderer.Content): Item.ArtistItem? {
     val (mainRuns, otherRuns) = content.runs
 
     return Item.ArtistItem(
@@ -84,7 +84,7 @@ fun mapToArtist(content: MusicShelfRenderer.Content): Item.ArtistItem? {
     ).takeIf { it.info?.endpoint?.browseId != null }
 }
 
-fun mapToPlaylist(content: MusicShelfRenderer.Content): Item.PlaylistItem? {
+internal fun mapToPlaylist(content: MusicShelfRenderer.Content): Item.PlaylistItem? {
     val (mainRuns, otherRuns) = content.runs
 
     return Item.PlaylistItem(

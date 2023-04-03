@@ -3,7 +3,7 @@ package com.stslex.core.network.model.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NavigationEndpoint(
+internal data class NavigationEndpoint(
     val watchEndpoint: Endpoint.Watch?,
     val watchPlaylistEndpoint: Endpoint.WatchPlaylist?,
     val browseEndpoint: Endpoint.Browse?,
@@ -13,9 +13,9 @@ data class NavigationEndpoint(
         get() = watchEndpoint ?: browseEndpoint ?: watchPlaylistEndpoint ?: searchEndpoint
 
     @Serializable
-    sealed class Endpoint {
+    internal sealed class Endpoint {
         @Serializable
-        data class Watch(
+        internal data class Watch(
             val params: String? = null,
             val playlistId: String? = null,
             val videoId: String? = null,
@@ -29,25 +29,25 @@ data class NavigationEndpoint(
                     ?.musicVideoType
 
             @Serializable
-            data class WatchEndpointMusicSupportedConfigs(
+            internal data class WatchEndpointMusicSupportedConfigs(
                 val watchEndpointMusicConfig: WatchEndpointMusicConfig?
             ) {
 
                 @Serializable
-                data class WatchEndpointMusicConfig(
+                internal data class WatchEndpointMusicConfig(
                     val musicVideoType: String?
                 )
             }
         }
 
         @Serializable
-        data class WatchPlaylist(
+        internal data class WatchPlaylist(
             val params: String?,
             val playlistId: String?,
         ) : Endpoint()
 
         @Serializable
-        data class Browse(
+        internal data class Browse(
             val params: String? = null,
             val browseId: String? = null,
             val browseEndpointContextSupportedConfigs: BrowseEndpointContextSupportedConfigs? = null,
@@ -58,19 +58,19 @@ data class NavigationEndpoint(
                     ?.pageType
 
             @Serializable
-            data class BrowseEndpointContextSupportedConfigs(
+            internal data class BrowseEndpointContextSupportedConfigs(
                 val browseEndpointContextMusicConfig: BrowseEndpointContextMusicConfig
             ) {
 
                 @Serializable
-                data class BrowseEndpointContextMusicConfig(
+                internal data class BrowseEndpointContextMusicConfig(
                     val pageType: String
                 )
             }
         }
 
         @Serializable
-        data class Search(
+        internal data class Search(
             val params: String?,
             val query: String,
         ) : Endpoint()

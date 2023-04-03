@@ -8,25 +8,25 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 
 @Serializable
-data class BrowseResponse(
+internal data class BrowseResponse(
     val contents: Contents?,
     val header: Header?,
     val microformat: Microformat?
 ) {
     @Serializable
-    data class Contents(
+    internal data class Contents(
         val singleColumnBrowseResultsRenderer: Tabs?,
         val sectionListRenderer: SectionListRenderer?,
     )
 
     @Serializable
-    data class Header @OptIn(ExperimentalSerializationApi::class) constructor(
+    internal data class Header @OptIn(ExperimentalSerializationApi::class) constructor(
         @JsonNames("musicVisualHeaderRenderer")
         val musicImmersiveHeaderRenderer: MusicImmersiveHeaderRenderer?,
         val musicDetailHeaderRenderer: MusicDetailHeaderRenderer?,
     ) {
         @Serializable
-        data class MusicDetailHeaderRenderer(
+        internal data class MusicDetailHeaderRenderer(
             val title: Runs?,
             val subtitle: Runs?,
             val secondSubtitle: Runs?,
@@ -34,7 +34,7 @@ data class BrowseResponse(
         )
 
         @Serializable
-        data class MusicImmersiveHeaderRenderer(
+        internal data class MusicImmersiveHeaderRenderer(
             val description: Runs?,
             val playButton: PlayButton?,
             val startRadioButton: StartRadioButton?,
@@ -43,23 +43,23 @@ data class BrowseResponse(
             val title: Runs?
         ) {
             @Serializable
-            data class PlayButton(
+            internal data class PlayButton(
                 val buttonRenderer: ButtonRenderer?
             )
 
             @Serializable
-            data class StartRadioButton(
+            internal data class StartRadioButton(
                 val buttonRenderer: ButtonRenderer?
             )
         }
     }
 
     @Serializable
-    data class Microformat(
+    internal data class Microformat(
         val microformatDataRenderer: MicroformatDataRenderer?
     ) {
         @Serializable
-        data class MicroformatDataRenderer(
+        internal data class MicroformatDataRenderer(
             val urlCanonical: String?
         )
     }

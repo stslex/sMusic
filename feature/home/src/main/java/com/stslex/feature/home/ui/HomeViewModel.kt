@@ -1,83 +1,50 @@
 package com.stslex.feature.home.ui
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.stslex.core.network.clients.YoutubeClient
-import com.stslex.core.network.data.model.YouTubePage
+import com.stslex.core.network.data.model.page.YoutubePageDataModel
+import com.stslex.core.network.data.model.player.PlayerDataModel
+import com.stslex.core.network.model.Value
+import com.stslex.feature.home.data.HomeRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
 class HomeViewModel(
-    private val homeClient: YoutubeClient
+    private val repository: HomeRepository
 ) : ViewModel() {
 
-    val pageResult: StateFlow<YouTubePage>
-        get() = homeClient.makeNextRequest()
+    val recommendations: StateFlow<YoutubePageDataModel>
+        get() = repository.recommendations
             .flowOn(Dispatchers.IO)
             .stateIn(
                 viewModelScope,
                 SharingStarted.Lazily,
-                YouTubePage()
+                YoutubePageDataModel()
             )
 
-}
+    private val _playerUrl: MutableStateFlow<Value<PlayerDataModel>> =
+        MutableStateFlow(Value.Loading)
 
-@Suppress("UNCHECKED_CAST")
-@Composable
-fun <T> persist(tag: String, initialValue: T): MutableState<T> {
-    val context = LocalContext.current
+    val playerUrl: StateFlow<Value<PlayerDataModel>>
+        get() = _playerUrl
 
-    return remember {
-        context.persistMap
-            ?.getOrPut(tag) { mutableStateOf(initialValue) } as? MutableState<T>
-            ?: mutableStateOf(initialValue)
-    }
-}
-
-@Composable
-fun <T> persistList(tag: String): MutableState<List<T>> =
-    persist(tag = tag, initialValue = emptyList())
-
-@Composable
-fun <T : Any?> persist(tag: String): MutableState<T?> =
-    persist(tag = tag, initialValue = null)
-
-val Context.persistMap: HashMap<String, Any?>?
-    get() = findOwner<PersistMapOwner>()?.persistMap
-
-internal inline fun <reified T> Context.findOwner(): T? {
-    var context = this
-    while (context is ContextWrapper) {
-        if (context is T) return context
-        context = context.baseContext
-    }
-    return null
-}
-
-interface PersistMapOwner {
-    val persistMap: HashMap<String, Any?>
-}
-
-@Composable
-fun PersistMapCleanup(tagPrefix: String) {
-    val context = LocalContext.current
-    DisposableEffect(context) {
-        onDispose {
-            if (context.findOwner<Activity>()?.isChangingConfigurations == false) {
-                context.persistMap?.keys?.removeAll { it.startsWith(tagPrefix) }
+    fun getPlayerData(id: String) {
+        _playerUrl.tryEmit(Value.Loading)
+        repository.getPlayerData(id = id)
+            .flowOn(Dispatchers.IO)
+            .catch { error ->
+                _playerUrl.emit(Value.Error(error))
             }
-        }
+            .onEach { item ->
+                _playerUrl.emit(Value.Content(item))
+            }
+            .launchIn(viewModelScope)
     }
 }

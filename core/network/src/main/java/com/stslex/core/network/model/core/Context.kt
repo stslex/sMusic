@@ -24,6 +24,7 @@ data class Context(
     )
 
     companion object {
+
         val DefaultWeb = Context(
             client = Client(
                 clientName = "WEB_REMIX",
