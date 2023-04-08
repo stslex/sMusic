@@ -1,51 +1,52 @@
 package com.stslex.core.network.mappers
 
-import com.stslex.core.network.data.model.Info
-import com.stslex.core.network.data.model.Item
-import com.stslex.core.network.data.model.YouTubePage
+import com.stslex.core.network.model.data.Info
+import com.stslex.core.network.model.data.Item
+import com.stslex.core.network.model.data.YouTubePage
 import com.stslex.core.network.model.response.NavigationEndpoint
 import com.stslex.core.network.model.response.Runs
 import com.stslex.core.network.model.response.browse.MusicCarouselShelfRenderer
 import com.stslex.core.network.model.response.browse.MusicResponsiveListItemRenderer
 import com.stslex.core.network.model.response.browse.SectionListRenderer
 
-fun SectionListRenderer?.mapYouTubePage() = YouTubePage(
+internal fun SectionListRenderer?.mapYouTubePage() = YouTubePage(
     songs = mapSong(),
     playlists = mapPlayList(),
     albums = mapAlbums(),
     artists = mapArtists(),
 )
 
-fun SectionListRenderer?.mapSong(): List<Item.SongItem>? = this
+internal fun SectionListRenderer?.mapSong(): List<Item.SongItem>? = this
     ?.findSectionByTitle("You might also like")
     ?.mapToContents()
     ?.mapNotNull(MusicCarouselShelfRenderer.Content::musicResponsiveListItemRenderer)
     ?.mapNotNull(::mapToSongItem)
 
-fun SectionListRenderer?.mapPlayList(): List<Item.PlaylistItem>? = this
+internal fun SectionListRenderer?.mapPlayList(): List<Item.PlaylistItem>? = this
     ?.findSectionByTitle("Recommended playlists")
     ?.mapToContents()
     ?.mapNotNull(MusicCarouselShelfRenderer.Content::musicTwoRowItemRenderer)
     ?.mapNotNull(::mapToPlaylistItem)
     ?.sortedByDescending { it.channel?.name == "YouTube Music" }
 
-fun SectionListRenderer?.mapAlbums(): List<Item.AlbumItem>? = this
+internal fun SectionListRenderer?.mapAlbums(): List<Item.AlbumItem>? = this
     ?.findSectionByStrapline("MORE FROM")
     ?.mapToContents()
     ?.mapNotNull(MusicCarouselShelfRenderer.Content::musicTwoRowItemRenderer)
     ?.mapNotNull(::mapToAlbumItem)
 
-fun SectionListRenderer?.mapArtists(): List<Item.ArtistItem>? = this
+internal fun SectionListRenderer?.mapArtists(): List<Item.ArtistItem>? = this
     ?.findSectionByTitle("Similar artists")
     ?.mapToContents()
     ?.mapNotNull(MusicCarouselShelfRenderer.Content::musicTwoRowItemRenderer)
     ?.mapNotNull(::mapToArtisItem)
 
-fun SectionListRenderer.Content.mapToContents(): List<MusicCarouselShelfRenderer.Content>? = this
-    .musicCarouselShelfRenderer
-    ?.contents
+internal fun SectionListRenderer.Content.mapToContents(): List<MusicCarouselShelfRenderer.Content>? =
+    this
+        .musicCarouselShelfRenderer
+        ?.contents
 
-fun mapToSongItem(renderer: MusicResponsiveListItemRenderer): Item.SongItem? {
+internal fun mapToSongItem(renderer: MusicResponsiveListItemRenderer): Item.SongItem? {
     return Item.SongItem(
         info = renderer
             .flexColumns

@@ -7,7 +7,7 @@ import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.coroutines.CoroutineScope
 import org.brotli.dec.BrotliInputStream
 
-object BrotliEncoder : ContentEncoder {
+internal object BrotliEncoder : ContentEncoder {
     override val name: String = "br"
 
     override fun CoroutineScope.encode(source: ByteReadChannel) =

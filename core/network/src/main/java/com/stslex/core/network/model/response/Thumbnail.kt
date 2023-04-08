@@ -3,7 +3,7 @@ package com.stslex.core.network.model.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Thumbnail(
+internal data class Thumbnail(
     val url: String,
     val height: Int?,
     val width: Int?

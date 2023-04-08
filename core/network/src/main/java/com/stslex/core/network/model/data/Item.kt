@@ -1,14 +1,14 @@
-package com.stslex.core.network.data.model
+package com.stslex.core.network.model.data
 
 import com.stslex.core.network.model.response.NavigationEndpoint
 import com.stslex.core.network.model.response.Thumbnail
 
-sealed class Item(
+internal sealed class Item(
     open val thumbnail: Thumbnail?,
     val key: String
 ) {
 
-    data class SongItem(
+    internal data class SongItem(
         val info: Info<NavigationEndpoint.Endpoint.Watch>?,
         val authors: List<Info<NavigationEndpoint.Endpoint.Browse>>?,
         val album: Info<NavigationEndpoint.Endpoint.Browse>?,
@@ -19,7 +19,7 @@ sealed class Item(
         key = info?.endpoint?.videoId.orEmpty()
     )
 
-    data class PlaylistItem(
+    internal data class PlaylistItem(
         val info: Info<NavigationEndpoint.Endpoint.Browse>?,
         val channel: Info<NavigationEndpoint.Endpoint.Browse>?,
         val songCount: Int?,
@@ -29,7 +29,7 @@ sealed class Item(
         key = info?.endpoint?.browseId.orEmpty()
     )
 
-    data class AlbumItem(
+    internal data class AlbumItem(
         val info: Info<NavigationEndpoint.Endpoint.Browse>?,
         val authors: List<Info<NavigationEndpoint.Endpoint.Browse>>?,
         val year: String?,
@@ -39,7 +39,7 @@ sealed class Item(
         key = info?.endpoint?.browseId.orEmpty()
     )
 
-    data class ArtistItem(
+    internal data class ArtistItem(
         val info: Info<NavigationEndpoint.Endpoint.Browse>?,
         val subscribersCountText: String?,
         override val thumbnail: Thumbnail?
@@ -48,4 +48,3 @@ sealed class Item(
         key = info?.endpoint?.browseId.orEmpty()
     )
 }
-

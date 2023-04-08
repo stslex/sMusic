@@ -6,7 +6,7 @@ import com.stslex.core.network.model.response.ThumbnailRenderer
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MusicTwoRowItemRenderer(
+internal data class MusicTwoRowItemRenderer(
     val navigationEndpoint: NavigationEndpoint?,
     val thumbnailRenderer: ThumbnailRenderer?,
     val title: Runs?,

@@ -1,9 +1,9 @@
-package com.stslex.core.network.data.model
+package com.stslex.core.network.model.data
 
 import com.stslex.core.network.model.response.NavigationEndpoint
 import com.stslex.core.network.model.response.Runs
 
-data class Info<T : NavigationEndpoint.Endpoint>(
+internal data class Info<T : NavigationEndpoint.Endpoint>(
     val name: String?,
     val endpoint: T?
 ) {

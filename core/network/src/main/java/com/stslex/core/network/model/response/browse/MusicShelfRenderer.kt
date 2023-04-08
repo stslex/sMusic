@@ -7,14 +7,14 @@ import com.stslex.core.network.model.response.Thumbnail
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MusicShelfRenderer(
+internal data class MusicShelfRenderer(
     val bottomEndpoint: NavigationEndpoint?,
     val contents: List<Content>?,
     val continuations: List<Continuation>?,
     val title: Runs?
 ) {
     @Serializable
-    data class Content(
+    internal data class Content(
         val musicResponsiveListItemRenderer: MusicResponsiveListItemRenderer?,
     ) {
         val runs: Pair<List<Runs.Run>, List<List<Runs.Run>>>
@@ -34,7 +34,7 @@ data class MusicShelfRenderer(
                         ?: emptyList()
                             )
 
-        val thumbnail: Thumbnail?
+        internal val thumbnail: Thumbnail?
             get() = musicResponsiveListItemRenderer
                 ?.thumbnail
                 ?.musicThumbnailRenderer

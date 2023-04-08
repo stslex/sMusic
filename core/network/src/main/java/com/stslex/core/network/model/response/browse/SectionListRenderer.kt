@@ -8,12 +8,12 @@ import kotlinx.serialization.json.JsonNames
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
-data class SectionListRenderer(
+internal data class SectionListRenderer(
     val contents: List<Content>?,
     val continuations: List<Continuation>?
 ) {
     @Serializable
-    data class Content(
+    internal data class Content(
         @JsonNames("musicImmersiveCarouselShelfRenderer")
         val musicCarouselShelfRenderer: MusicCarouselShelfRenderer?,
         @JsonNames("musicPlaylistShelfRenderer")
@@ -23,7 +23,7 @@ data class SectionListRenderer(
     ) {
 
         @Serializable
-        data class MusicDescriptionShelfRenderer(
+        internal data class MusicDescriptionShelfRenderer(
             val description: Runs?,
         )
     }

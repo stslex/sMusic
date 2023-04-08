@@ -53,4 +53,8 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore)
+
+    testApi(libs.junit)
+    androidTestApi(libs.androidx.test.ext.junit)
+    androidTestApi(libs.espresso.core)
 }

@@ -3,7 +3,7 @@ package com.stslex.core.network.model.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Runs(
+internal data class Runs(
     val runs: List<Run> = listOf()
 ) {
     val text: String
@@ -24,7 +24,7 @@ data class Runs(
     }
 
     @Serializable
-    data class Run(
+    internal data class Run(
         val text: String?,
         val navigationEndpoint: NavigationEndpoint?,
     )
