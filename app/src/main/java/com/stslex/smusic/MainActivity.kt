@@ -11,8 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.stslex.core.ui.extensions.animatedBackground
-import com.stslex.smusic.screen.MainScreen
 import com.stslex.core.ui.theme.AppTheme
+import com.stslex.smusic.screen.MainScreen
 import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {

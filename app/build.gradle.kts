@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:home"))
+    implementation(project(":core:player"))
 
     implementation(libs.bundles.koin)
     implementation(libs.androidx.activity.ktx)

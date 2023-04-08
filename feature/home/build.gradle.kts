@@ -43,10 +43,10 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:navigation"))
     implementation(project(":core:network"))
+    implementation(project(":core:player"))
 
     implementation(libs.bundles.koin)
     implementation(libs.bundles.ktor)
-    implementation(libs.bundles.media3)
 
     implementation("io.coil-kt:coil-compose:2.2.2")
     implementation("androidx.compose.ui:ui-util:1.4.1")
