@@ -79,6 +79,12 @@ class MediaServiceControllerImpl(
             }
 
             PlayerEvent.ResumePause -> {
+                if (simpleMediaState.value == SimpleMediaState.Initial) {
+                    currentPlayingMedia.value?.let {
+                        player.addMediaItem(it)
+                        player.prepare()
+                    }
+                }
                 player.playWhenReady = player.playWhenReady.not()
             }
 
@@ -148,12 +154,8 @@ class MediaServiceControllerImpl(
     }
 
     override suspend fun addMediaItems(songItemList: List<ItemData.SongItem>) {
-        val currentMedia = currentPlayingMedia.value
         songItemList.forEachIndexed { index, songItem ->
-            if (currentMedia != null && songItem.key == currentMedia.mediaId) {
-                mediaCache[songItem.key] = index
-                player.addMediaItem(index, currentMedia)
-            } else if (mediaCache.containsKey(songItem.key).not()) {
+            if (mediaCache.containsKey(songItem.key).not()) {
                 mediaServiceRepository
                     .getPlayerData(songItem.key)
                     .flowOn(Dispatchers.IO)
