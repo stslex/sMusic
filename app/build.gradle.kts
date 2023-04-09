@@ -46,9 +46,11 @@ dependencies {
     implementation(project(":core:navigation"))
     implementation(project(":core:datastore"))
     implementation(project(":core:network"))
-    implementation(project(":feature:settings"))
-    implementation(project(":feature:home"))
     implementation(project(":core:player"))
+    implementation(project(":feature:settings"))
+    implementation(project(":feature:recommendation"))
+    implementation(project(":feature:search"))
+    implementation(project(":feature:favourite"))
 
     implementation(libs.bundles.koin)
     implementation(libs.androidx.activity.ktx)

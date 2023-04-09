@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.stslex.core.navigation.NavDestination
 import com.stslex.core.ui.extensions.animatedOnSurface
-import com.stslex.smusic.R
 
 @Composable
 fun AppBarTitle(
@@ -16,11 +15,7 @@ fun AppBarTitle(
 ) {
     Text(
         modifier = modifier,
-        text = if (currentRoute == NavDestination.SETTINGS.route) {
-            "Settings"
-        } else {
-            stringResource(id = R.string.app_name)
-        },
+        text = stringResource(id = NavDestination.valueOfRoute(currentRoute).titleRes),
         color = animatedOnSurface().value,
         style = MaterialTheme.typography.displaySmall
     )

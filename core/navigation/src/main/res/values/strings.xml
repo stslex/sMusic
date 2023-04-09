@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">sMusic</string>
+    <string name="app_nav_recommendation">Top</string>
+    <string name="app_nav_favourite">Favourite</string>
+    <string name="app_nav_search">Search</string>
+    <string name="app_nav_settings">Settings</string>
+</resources>
