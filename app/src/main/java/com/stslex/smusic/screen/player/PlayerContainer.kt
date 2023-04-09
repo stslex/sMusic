@@ -14,6 +14,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,6 +27,7 @@ import coil.compose.AsyncImage
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
+import com.stslex.core.ui.components.setStaticPlaceHolder
 import kotlinx.coroutines.flow.Flow
 import kotlin.reflect.KProperty0
 
@@ -48,6 +50,10 @@ fun PlayerContainer(
     val playingProgress by remember {
         playerPlayingProgress.get()
     }.collectAsState(initial = SimpleMediaState.Progress(0L))
+
+    val isShimmerVisible by remember {
+        derivedStateOf { mediaItem == null }
+    }
 
     Column(
         modifier = Modifier
@@ -75,7 +81,9 @@ fun PlayerContainer(
                 .wrapContentHeight()
         ) {
             AsyncImage(
-                modifier = Modifier.size(60.dp),
+                modifier = Modifier
+                    .setStaticPlaceHolder(isVisible = isShimmerVisible)
+                    .size(60.dp),
                 model = mediaItem?.mediaMetadata?.artworkUri,
                 contentDescription = null,
                 contentScale = ContentScale.Crop
@@ -84,11 +92,13 @@ fun PlayerContainer(
             PlayerTextContainer(
                 modifier = Modifier.weight(1f),
                 artist = mediaItem?.mediaMetadata?.artist?.toString().orEmpty(),
-                title = mediaItem?.mediaMetadata?.title?.toString().orEmpty()
+                title = mediaItem?.mediaMetadata?.title?.toString().orEmpty(),
+                isShimmerVisible = isShimmerVisible
             )
 
             PlayerPausePlayButton(
-                modifier = Modifier.align(Alignment.CenterVertically),
+                modifier = Modifier
+                    .align(Alignment.CenterVertically),
                 playerPlayingState = playingState,
                 onPlayerClick = onPlayerClick
             )

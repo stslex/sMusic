@@ -3,6 +3,7 @@ package com.stslex.smusic.screen.player
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -13,13 +14,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.stslex.core.ui.components.setStaticPlaceHolder
 import com.stslex.core.ui.extensions.animatedOnBackground
 
 @Composable
 fun PlayerTextContainer(
     modifier: Modifier = Modifier,
     artist: String,
-    title: String
+    title: String,
+    isShimmerVisible: Boolean
 ) {
     Box(
         modifier = modifier
@@ -35,7 +38,9 @@ fun PlayerTextContainer(
                 .align(Alignment.CenterStart)
         ) {
             Text(
-                modifier = Modifier,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .setStaticPlaceHolder(isVisible = isShimmerVisible),
                 text = artist,
                 style = MaterialTheme.typography.titleMedium,
                 color = animatedOnBackground().value,
@@ -43,7 +48,9 @@ fun PlayerTextContainer(
             )
             Spacer(modifier = Modifier.padding(4.dp))
             Text(
-                modifier = Modifier,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .setStaticPlaceHolder(isVisible = isShimmerVisible),
                 text = title,
                 style = MaterialTheme.typography.bodyMedium,
                 color = animatedOnBackground().value,

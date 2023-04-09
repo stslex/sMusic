@@ -6,11 +6,11 @@ sealed class ItemData(
 ) {
 
     data class SongItem(
-        val info: WatchDataModel,
-        val authors: List<BrowseDataModel>,
-        val album: BrowseDataModel,
-        val durationText: String,
-        override val thumbnail: ThumbnailDataModel,
+        val info: WatchDataModel = WatchDataModel(),
+        val authors: List<BrowseDataModel> = emptyList(),
+        val album: BrowseDataModel = BrowseDataModel(),
+        val durationText: String = "",
+        override val thumbnail: ThumbnailDataModel = ThumbnailDataModel(),
     ) : ItemData(
         thumbnail = thumbnail,
         key = info.videoId

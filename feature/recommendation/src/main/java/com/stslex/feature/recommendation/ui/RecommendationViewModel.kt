@@ -14,18 +14,18 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class HomeViewModel(
+class RecommendationViewModel(
     private val repository: HomeRepository,
     private val mediaController: MediaServiceController
 ) : ViewModel() {
 
-    val recommendations: StateFlow<YoutubePageDataModel>
+    val recommendations: StateFlow<YoutubePageDataModel?>
         get() = repository.recommendations
             .flowOn(Dispatchers.IO)
             .stateIn(
                 viewModelScope,
                 SharingStarted.Lazily,
-                YoutubePageDataModel()
+                null
             )
 
     val currentPlayingMedia: StateFlow<MediaItem?>

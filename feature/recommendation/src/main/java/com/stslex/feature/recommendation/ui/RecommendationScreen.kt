@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.network.data.model.page.ItemData
+import com.stslex.core.ui.components.setDynamicPlaceHolder
 import com.stslex.core.ui.extensions.animatedOnBackground
 import com.stslex.core.ui.extensions.toPx
 import com.stslex.feature.recommendation.utils.asMediaItem
@@ -45,13 +46,13 @@ import kotlin.math.roundToInt
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navigate: (NavigationScreen) -> Unit,
-    viewModel: HomeViewModel
+    viewModel: RecommendationViewModel
 ) {
     val recommendations by remember(viewModel) {
         viewModel.recommendations
-    }.collectAsState()
+    }.collectAsState(null)
 
-    val items = recommendations.songs.dropLast(1)
+    val items = recommendations?.songs?.dropLast(1).orEmpty()
 
     val currentPlayingMedia by remember(viewModel) {
         viewModel.currentPlayingMedia
@@ -61,24 +62,36 @@ fun HomeScreen(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 100.dp)
     ) {
-        items(
-            items = items,
-            key = { it.key }
-        ) { item ->
-            Song(
-                songItem = item,
-                onClick = {
-                    viewModel.play(item.asMediaItem)
-                },
-                modifier = Modifier
-                    .background(
-                        if (currentPlayingMedia?.mediaId == item.key) {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        } else {
-                            MaterialTheme.colorScheme.surface
-                        }
-                    )
-            )
+        if (recommendations == null) {
+            items(count = 10) {
+                Song(
+                    songItem = ItemData.SongItem(),
+                    onClick = {},
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface),
+                    isPlaceHolder = true
+                )
+            }
+        } else {
+            items(
+                items = items,
+                key = { it.key }
+            ) { item ->
+                Song(
+                    songItem = item,
+                    onClick = {
+                        viewModel.play(item.asMediaItem)
+                    },
+                    modifier = Modifier
+                        .background(
+                            if (currentPlayingMedia?.mediaId == item.key) {
+                                MaterialTheme.colorScheme.surfaceVariant
+                            } else {
+                                MaterialTheme.colorScheme.surface
+                            }
+                        )
+                )
+            }
         }
     }
 }
@@ -87,7 +100,8 @@ fun HomeScreen(
 fun Song(
     modifier: Modifier = Modifier,
     songItem: ItemData.SongItem,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isPlaceHolder: Boolean = false
 ) {
     Row(
         modifier = Modifier
@@ -106,7 +120,9 @@ fun Song(
 
         ) {
         AsyncImage(
-            modifier = Modifier.size(50.dp),
+            modifier = Modifier
+                .setDynamicPlaceHolder(isVisible = isPlaceHolder)
+                .size(50.dp),
             model = songItem.thumbnail.size(50.dp.toPx.roundToInt()),
             contentDescription = null,
             contentScale = ContentScale.Crop
@@ -124,7 +140,9 @@ fun Song(
                     .align(Alignment.CenterStart)
             ) {
                 Text(
-                    modifier = Modifier,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .setDynamicPlaceHolder(isVisible = isPlaceHolder),
                     text = songItem.authors
                         .joinToString {
                             it.name.plus(" ")
@@ -135,7 +153,9 @@ fun Song(
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text(
-                    modifier = Modifier,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .setDynamicPlaceHolder(isVisible = isPlaceHolder),
                     text = songItem.info.name,
                     style = MaterialTheme.typography.bodyMedium,
                     color = animatedOnBackground().value,
