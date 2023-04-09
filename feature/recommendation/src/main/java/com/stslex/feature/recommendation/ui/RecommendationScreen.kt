@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -39,7 +39,6 @@ import com.stslex.core.network.data.model.page.ItemData
 import com.stslex.core.ui.components.setDynamicPlaceHolder
 import com.stslex.core.ui.extensions.animatedOnBackground
 import com.stslex.core.ui.extensions.toPx
-import com.stslex.feature.recommendation.utils.asMediaItem
 import kotlin.math.roundToInt
 
 @Composable
@@ -73,14 +72,17 @@ fun HomeScreen(
                 )
             }
         } else {
-            items(
+            itemsIndexed(
                 items = items,
-                key = { it.key }
-            ) { item ->
+                key = { index, item -> item.key }
+            ) { index, item ->
                 Song(
                     songItem = item,
                     onClick = {
-                        viewModel.play(item.asMediaItem)
+                        viewModel.play(
+                            songItem = item,
+                            index = index
+                        )
                     },
                     modifier = Modifier
                         .background(

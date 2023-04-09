@@ -2,6 +2,7 @@ package com.stslex.core.player.controller
 
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import com.stslex.core.network.data.model.page.ItemData
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
@@ -20,4 +21,6 @@ interface MediaServiceController : Player.Listener {
     suspend fun addMediaItemList(mediaItemList: List<MediaItem>)
 
     suspend fun onPlayerEvent(playerEvent: PlayerEvent)
+
+    suspend fun addMediaItems(songItemList: List<ItemData.SongItem>)
 }

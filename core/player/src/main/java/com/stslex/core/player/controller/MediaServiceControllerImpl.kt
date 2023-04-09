@@ -3,7 +3,9 @@ package com.stslex.core.player.controller
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.stslex.core.network.data.model.page.ItemData
 import com.stslex.core.player.data.MediaServiceRepository
+import com.stslex.core.player.data.mapToMediaItem
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
@@ -40,10 +42,7 @@ class MediaServiceControllerImpl(
             .getPlayerData(this)
             .flowOn(Dispatchers.IO)
 
-    private val List<MediaItem>.networkItemList: Flow<List<MediaItem>>
-        get() = mediaServiceRepository
-            .getPlayerData(this)
-            .flowOn(Dispatchers.IO)
+    private val mediaCache = mutableMapOf<String, MediaItem>()
 
     private var job: Job
 
@@ -60,10 +59,8 @@ class MediaServiceControllerImpl(
     }
 
     override suspend fun addMediaItemList(mediaItemList: List<MediaItem>) {
-        mediaItemList.networkItemList.collect { item ->
-            player.setMediaItems(item)
-            player.prepare()
-        }
+        player.setMediaItems(mediaItemList)
+        player.prepare()
     }
 
     override suspend fun onPlayerEvent(playerEvent: PlayerEvent) {
@@ -87,7 +84,38 @@ class MediaServiceControllerImpl(
 
             PlayerEvent.Stop -> stopProgressUpdate()
             is PlayerEvent.UpdateProgress -> player.seekTo((player.duration * playerEvent.newProgress).toLong())
+
+            is PlayerEvent.PlayPauseCurrent -> {
+                val mediaItem = mediaCache[playerEvent.songItem.key]
+                if (mediaItem == null) {
+                    playNewMediaItem(
+                        songItem = playerEvent.songItem,
+                        index = playerEvent.index
+                    )
+                } else {
+                    player.seekTo(playerEvent.index, 0)
+                    player.prepare()
+                    player.play()
+                }
+            }
         }
+    }
+
+    private suspend fun playNewMediaItem(
+        songItem: ItemData.SongItem,
+        index: Int
+    ) {
+        mediaServiceRepository
+            .getPlayerData(songItem.key)
+            .flowOn(Dispatchers.IO)
+            .collect { playerDataModel ->
+                val currentMedia = songItem.mapToMediaItem(playerDataModel)
+                mediaCache[songItem.key] = currentMedia
+                player.addMediaItem(index, currentMedia)
+                player.seekTo(index, 0)
+                player.prepare()
+                player.play()
+            }
     }
 
     override fun onPlaybackStateChanged(playbackState: Int) {
@@ -140,6 +168,21 @@ class MediaServiceControllerImpl(
     private fun stopProgressUpdate() {
         job.cancel()
         _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = false)
+    }
+
+    override suspend fun addMediaItems(songItemList: List<ItemData.SongItem>) {
+        songItemList.forEachIndexed { index, songItem ->
+            if (mediaCache.containsKey(songItem.key).not()) {
+                mediaServiceRepository
+                    .getPlayerData(songItem.key)
+                    .flowOn(Dispatchers.IO)
+                    .collect { playerDataModel ->
+                        val mediaItem = songItem.mapToMediaItem(playerDataModel)
+                        mediaCache[songItem.key] = mediaItem
+                        player.addMediaItem(index, mediaItem)
+                    }
+            }
+        }
     }
 }
 

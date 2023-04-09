@@ -3,6 +3,7 @@ package com.stslex.feature.recommendation.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
+import com.stslex.core.network.data.model.page.ItemData
 import com.stslex.core.network.data.model.page.YoutubePageDataModel
 import com.stslex.core.player.controller.MediaServiceController
 import com.stslex.core.player.model.PlayerEvent
@@ -11,6 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -28,19 +31,29 @@ class RecommendationViewModel(
                 null
             )
 
+    init {
+        recommendations
+            .onEach { recommendation ->
+                recommendation?.songs?.let { songs ->
+                    mediaController.addMediaItems(songs)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
     val currentPlayingMedia: StateFlow<MediaItem?>
         get() = mediaController.currentPlayingMedia
 
-    fun play(mediaItem: MediaItem) {
+    fun play(
+        songItem: ItemData.SongItem,
+        index: Int
+    ) {
+        val event = PlayerEvent.PlayPauseCurrent(
+            songItem = songItem,
+            index = index
+        )
         viewModelScope.launch {
-            mediaController.addMediaItem(mediaItem)
-            mediaController.onPlayerEvent(PlayerEvent.PlayPause)
-        }
-    }
-
-    fun stop() {
-        viewModelScope.launch {
-            mediaController.onPlayerEvent(PlayerEvent.PlayPause)
+            mediaController.onPlayerEvent(event)
         }
     }
 }
