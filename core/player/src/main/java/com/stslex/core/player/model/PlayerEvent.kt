@@ -5,5 +5,6 @@ sealed class PlayerEvent {
     object Backward : PlayerEvent()
     object Forward : PlayerEvent()
     object Stop : PlayerEvent()
+    object ResumePause : PlayerEvent()
     data class UpdateProgress(val newProgress: Float) : PlayerEvent()
 }
