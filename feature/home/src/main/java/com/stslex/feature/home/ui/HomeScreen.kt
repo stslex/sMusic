@@ -1,10 +1,10 @@
 package com.stslex.feature.home.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,27 +24,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.network.data.model.page.ItemData
-import com.stslex.core.network.model.Value
 import com.stslex.core.ui.extensions.animatedOnBackground
 import com.stslex.core.ui.extensions.toPx
-import org.koin.core.component.getScopeName
+import com.stslex.feature.home.utils.asMediaItem
 import kotlin.math.roundToInt
 
 @Composable
@@ -56,46 +50,16 @@ fun HomeScreen(
     val recommendations by remember(viewModel) {
         viewModel.recommendations
     }.collectAsState()
-    val context = LocalContext.current
 
     val items = recommendations.songs.dropLast(1)
 
-    val playerInfoState by remember(viewModel) {
-        viewModel.playerUrl
+    val currentPlayingMedia by remember(viewModel) {
+        viewModel.currentPlayingMedia
     }.collectAsState()
 
-    val selectedItem = remember {
-        mutableStateOf<ItemData.SongItem?>(null)
-    }
-
-    LaunchedEffect(key1 = selectedItem.value) {
-        selectedItem.value?.let {
-            viewModel.getPlayerData(id = it.key)
-        }
-    }
-
-    when (val state = playerInfoState) {
-
-        is Value.Loading -> Unit
-
-        is Value.Content -> selectedItem.value?.let { item ->
-            val url = state.data
-                .streamingData
-                .highestQualityFormat
-                ?.url
-                .orEmpty()
-                .toUri()
-            val mediaItem = item.asMediaItem(url, 300.dp.toPx.roundToInt())
-            viewModel.play(mediaItem)
-        }
-
-        is Value.Error -> {
-            Log.d(currentRecomposeScope.getScopeName().value, state.error.message.orEmpty())
-        }
-    }
-
     LazyColumn(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 100.dp)
     ) {
         items(
             items = items,
@@ -104,16 +68,11 @@ fun HomeScreen(
             Song(
                 songItem = item,
                 onClick = {
-                    if (selectedItem.value == item) {
-                        viewModel.stop()
-                        selectedItem.value = null
-                    } else {
-                        selectedItem.value = item
-                    }
+                    viewModel.play(item.asMediaItem)
                 },
                 modifier = Modifier
                     .background(
-                        if (selectedItem.value?.key == item.key) {
+                        if (currentPlayingMedia?.mediaId == item.key) {
                             MaterialTheme.colorScheme.surfaceVariant
                         } else {
                             MaterialTheme.colorScheme.surface
@@ -167,10 +126,9 @@ fun Song(
                 Text(
                     modifier = Modifier,
                     text = songItem.authors
-                        ?.joinToString {
-                            it.name.orEmpty().plus(" ")
-                        }
-                        .orEmpty(),
+                        .joinToString {
+                            it.name.plus(" ")
+                        },
                     style = MaterialTheme.typography.titleMedium,
                     color = animatedOnBackground().value,
                     overflow = TextOverflow.Ellipsis
@@ -178,7 +136,7 @@ fun Song(
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text(
                     modifier = Modifier,
-                    text = songItem.info?.name.orEmpty(),
+                    text = songItem.info.name,
                     style = MaterialTheme.typography.bodyMedium,
                     color = animatedOnBackground().value,
                     overflow = TextOverflow.Ellipsis

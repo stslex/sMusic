@@ -1,42 +1,69 @@
-package com.stslex.core.player.service
+package com.stslex.core.player.controller
 
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.stslex.core.player.data.MediaServiceRepository
 import com.stslex.core.player.model.PlayerEvent
+import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
-class MediaServiceHandlerImpl(
-    private val player: ExoPlayer
-) : MediaServiceHandler {
+class MediaServiceControllerImpl(
+    private val player: ExoPlayer,
+    private val mediaServiceRepository: MediaServiceRepository
+) : MediaServiceController {
 
     private val _simpleMediaState = MutableStateFlow<SimpleMediaState>(SimpleMediaState.Initial)
     override val simpleMediaState: StateFlow<SimpleMediaState>
         get() = _simpleMediaState.asStateFlow()
 
-    private var job: Job? = null
+    private val _playerPlayingState = MutableStateFlow(PlayerPlayingState.PAUSE)
+    override val playerPlayingState: StateFlow<PlayerPlayingState>
+        get() = _playerPlayingState.asStateFlow()
+
+    private val _currentPlayingMedia = MutableStateFlow<MediaItem?>(null)
+    override val currentPlayingMedia: StateFlow<MediaItem?>
+        get() = _currentPlayingMedia.asStateFlow()
+
+    private val MediaItem.networkItem: Flow<MediaItem>
+        get() = mediaServiceRepository
+            .getPlayerData(this)
+            .flowOn(Dispatchers.IO)
+
+    private val List<MediaItem>.networkItemList: Flow<List<MediaItem>>
+        get() = mediaServiceRepository
+            .getPlayerData(this)
+            .flowOn(Dispatchers.IO)
+
+    private var job: Job
 
     init {
         player.addListener(this)
         job = Job()
     }
 
-    override fun addMediaItem(mediaItem: MediaItem) {
-        player.setMediaItem(mediaItem)
-        player.prepare()
+    override suspend fun addMediaItem(mediaItem: MediaItem) {
+        mediaItem.networkItem.collect { item ->
+            player.setMediaItem(item)
+            player.prepare()
+        }
     }
 
-    override fun addMediaItemList(mediaItemList: List<MediaItem>) {
-        player.setMediaItems(mediaItemList)
-        player.prepare()
+    override suspend fun addMediaItemList(mediaItemList: List<MediaItem>) {
+        mediaItemList.networkItemList.collect { item ->
+            player.setMediaItems(item)
+            player.prepare()
+        }
     }
 
     override suspend fun onPlayerEvent(playerEvent: PlayerEvent) {
@@ -52,6 +79,10 @@ class MediaServiceHandlerImpl(
                     _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = true)
                     startProgressUpdate()
                 }
+            }
+
+            PlayerEvent.ResumePause -> {
+                player.playWhenReady = player.playWhenReady.not()
             }
 
             PlayerEvent.Stop -> stopProgressUpdate()
@@ -80,24 +111,34 @@ class MediaServiceHandlerImpl(
     override fun onIsPlayingChanged(isPlaying: Boolean) {
         _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = isPlaying)
         if (isPlaying) {
+            _playerPlayingState.value = PlayerPlayingState.PLAY
             // TODO
             GlobalScope.launch(Dispatchers.Main) {
                 startProgressUpdate()
             }
         } else {
+            _playerPlayingState.value = PlayerPlayingState.PAUSE
             stopProgressUpdate()
         }
+    }
+
+    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+        super.onMediaItemTransition(mediaItem, reason)
+        _currentPlayingMedia.tryEmit(mediaItem)
     }
 
     private suspend fun startProgressUpdate() = job.run {
         while (true) {
             delay(500)
-            _simpleMediaState.value = SimpleMediaState.Progress(player.currentPosition)
+            _simpleMediaState.value = SimpleMediaState.Progress(
+                progress = player.currentPosition,
+                duration = player.duration
+            )
         }
     }
 
     private fun stopProgressUpdate() {
-        job?.cancel()
+        job.cancel()
         _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = false)
     }
 }

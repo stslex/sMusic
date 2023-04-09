@@ -6,8 +6,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import com.stslex.core.player.notification.MediaNotificationManager
 import com.stslex.core.player.notification.MediaNotificationManagerImpl
-import com.stslex.core.player.service.MediaServiceHandler
-import com.stslex.core.player.service.MediaServiceHandlerImpl
+import com.stslex.core.player.controller.MediaServiceController
+import com.stslex.core.player.controller.MediaServiceControllerImpl
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -38,5 +38,5 @@ val playerModule = module {
         )
     }
 
-    singleOf(::MediaServiceHandlerImpl) { bind<MediaServiceHandler>() }
+    singleOf(::MediaServiceControllerImpl) { bind<MediaServiceController>() }
 }

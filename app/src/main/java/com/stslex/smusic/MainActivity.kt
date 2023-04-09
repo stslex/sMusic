@@ -43,7 +43,13 @@ class MainActivity : AppCompatActivity() {
             ) {
                 systemUiController.setSystemBarsColor(color = animatedBackground().value)
 
-                MainScreen(navHostController = navHostController)
+                MainScreen(
+                    navHostController = navHostController,
+                    currentMediaItem = viewModel::currentMediaItem,
+                    onPlayerClick = viewModel::onPlayerClick,
+                    playerPlayingState = viewModel::playerPlayingState,
+                    playerPlayingProgress = viewModel::mediaProgress
+                )
             }
         }
     }

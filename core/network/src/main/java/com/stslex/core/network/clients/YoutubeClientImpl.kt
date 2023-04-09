@@ -61,11 +61,21 @@ class YoutubeClientImpl(
 
     override fun getPlayerData(
         id: String
-    ): Flow<PlayerDataModel> = getPlayerData(
+    ): Flow<PlayerDataModel> = flow {
+        getPlayerData(body = PlayerBody(videoId = id))?.let {
+            emit(it)
+        }
+    }
+
+    override suspend fun getPlayerDataRow(
+        id: String
+    ): PlayerDataModel? = getPlayerData(
         body = PlayerBody(videoId = id)
     )
 
-    private fun getPlayerData(body: PlayerBody): Flow<PlayerDataModel> = flow {
+    private suspend fun getPlayerData(
+        body: PlayerBody
+    ): PlayerDataModel? {
         val response = client
             .post(player) {
                 setBody(body)
@@ -73,8 +83,10 @@ class YoutubeClientImpl(
             .body<PlayerResponse>()
             .mapToData()
 
-        if (response.playabilityStatus == "OK") {
-            emit(response)
+        return if (response.playabilityStatus == "OK") {
+            response
+        } else {
+            null
         }
     }
 }

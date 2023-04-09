@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:network"))
     implementation(libs.bundles.koin)
     api(libs.bundles.media3)
 
