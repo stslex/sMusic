@@ -33,7 +33,7 @@ class MediaServiceControllerImpl(
     override val playerPlayingState: StateFlow<PlayerPlayingState>
         get() = _playerPlayingState.asStateFlow()
 
-    private val _currentPlayingMedia = MutableStateFlow<MediaItem?>(null)
+    private val _currentPlayingMedia = MutableStateFlow(player.currentMediaItem)
     override val currentPlayingMedia: StateFlow<MediaItem?>
         get() = _currentPlayingMedia.asStateFlow()
 
@@ -42,7 +42,7 @@ class MediaServiceControllerImpl(
             .getPlayerData(this)
             .flowOn(Dispatchers.IO)
 
-    private val mediaCache = mutableMapOf<String, MediaItem>()
+    private val mediaCache = mutableMapOf<String, Int>()
 
     private var job: Job
 
@@ -86,36 +86,13 @@ class MediaServiceControllerImpl(
             is PlayerEvent.UpdateProgress -> player.seekTo((player.duration * playerEvent.newProgress).toLong())
 
             is PlayerEvent.PlayPauseCurrent -> {
-                val mediaItem = mediaCache[playerEvent.songItem.key]
-                if (mediaItem == null) {
-                    playNewMediaItem(
-                        songItem = playerEvent.songItem,
-                        index = playerEvent.index
-                    )
-                } else {
-                    player.seekTo(playerEvent.index, 0)
+                mediaCache[playerEvent.id]?.let { index ->
+                    player.seekTo(index, 0)
                     player.prepare()
                     player.play()
                 }
             }
         }
-    }
-
-    private suspend fun playNewMediaItem(
-        songItem: ItemData.SongItem,
-        index: Int
-    ) {
-        mediaServiceRepository
-            .getPlayerData(songItem.key)
-            .flowOn(Dispatchers.IO)
-            .collect { playerDataModel ->
-                val currentMedia = songItem.mapToMediaItem(playerDataModel)
-                mediaCache[songItem.key] = currentMedia
-                player.addMediaItem(index, currentMedia)
-                player.seekTo(index, 0)
-                player.prepare()
-                player.play()
-            }
     }
 
     override fun onPlaybackStateChanged(playbackState: Int) {
@@ -171,14 +148,18 @@ class MediaServiceControllerImpl(
     }
 
     override suspend fun addMediaItems(songItemList: List<ItemData.SongItem>) {
+        val currentMedia = currentPlayingMedia.value
         songItemList.forEachIndexed { index, songItem ->
-            if (mediaCache.containsKey(songItem.key).not()) {
+            if (currentMedia != null && songItem.key == currentMedia.mediaId) {
+                mediaCache[songItem.key] = index
+                player.addMediaItem(index, currentMedia)
+            } else if (mediaCache.containsKey(songItem.key).not()) {
                 mediaServiceRepository
                     .getPlayerData(songItem.key)
                     .flowOn(Dispatchers.IO)
                     .collect { playerDataModel ->
                         val mediaItem = songItem.mapToMediaItem(playerDataModel)
-                        mediaCache[songItem.key] = mediaItem
+                        mediaCache[songItem.key] = index
                         player.addMediaItem(index, mediaItem)
                     }
             }

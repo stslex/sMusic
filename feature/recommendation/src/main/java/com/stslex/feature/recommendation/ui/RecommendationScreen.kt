@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -51,7 +51,7 @@ fun HomeScreen(
         viewModel.recommendations
     }.collectAsState(null)
 
-    val items = recommendations?.songs?.dropLast(1).orEmpty()
+    val items = recommendations?.songs.orEmpty()
 
     val currentPlayingMedia by remember(viewModel) {
         viewModel.currentPlayingMedia
@@ -72,17 +72,14 @@ fun HomeScreen(
                 )
             }
         } else {
-            itemsIndexed(
+            items(
                 items = items,
-                key = { index, item -> item.key }
-            ) { index, item ->
+                key = { item -> item.key }
+            ) { item ->
                 Song(
                     songItem = item,
                     onClick = {
-                        viewModel.play(
-                            songItem = item,
-                            index = index
-                        )
+                        viewModel.play(item.key)
                     },
                     modifier = Modifier
                         .background(
