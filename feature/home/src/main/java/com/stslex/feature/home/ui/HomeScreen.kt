@@ -1,8 +1,6 @@
 package com.stslex.feature.home.ui
 
-import android.net.Uri
 import android.util.Log
-import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,14 +38,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.session.MediaSession
 import coil.compose.AsyncImage
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.network.data.model.page.ItemData
@@ -66,26 +56,9 @@ fun HomeScreen(
     val recommendations by remember(viewModel) {
         viewModel.recommendations
     }.collectAsState()
+    val context = LocalContext.current
 
     val items = recommendations.songs.dropLast(1)
-
-    val context = LocalContext.current
-    val player = remember {
-        ExoPlayer.Builder(context)
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(C.USAGE_MEDIA)
-                    .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-                    .build(),
-                true
-            )
-            .build()
-    }
-    val mediaSession = remember {
-        MediaSession
-            .Builder(context, player)
-            .build()
-    }
 
     val playerInfoState by remember(viewModel) {
         viewModel.playerUrl
@@ -112,15 +85,11 @@ fun HomeScreen(
                 ?.url
                 .orEmpty()
                 .toUri()
-            val mediaItem = item.asMediaItem(url)
-            mediaSession.player.setMediaItem(mediaItem)
-            mediaSession.player.prepare()
-            mediaSession.player.play()
+            val mediaItem = item.asMediaItem(url, 300.dp.toPx.roundToInt())
+            viewModel.play(mediaItem)
         }
 
         is Value.Error -> {
-            mediaSession.player.stop()
-            mediaSession.player.release()
             Log.d(currentRecomposeScope.getScopeName().value, state.error.message.orEmpty())
         }
     }
@@ -136,7 +105,7 @@ fun HomeScreen(
                 songItem = item,
                 onClick = {
                     if (selectedItem.value == item) {
-                        mediaSession.player.pause()
+                        viewModel.stop()
                         selectedItem.value = null
                     } else {
                         selectedItem.value = item
@@ -154,32 +123,6 @@ fun HomeScreen(
         }
     }
 }
-
-val ItemData.SongItem.asMediaItem: (Uri) -> MediaItem
-    @OptIn(UnstableApi::class)
-    get() = { uri ->
-        MediaItem.Builder()
-            .setMediaId(key)
-            .setUri(uri)
-            .setCustomCacheKey(key)
-            .setMediaMetadata(
-                MediaMetadata.Builder()
-                    .setTitle(info.name)
-                    .setArtist(authors.joinToString("") { it.name })
-                    .setAlbumTitle(album.name)
-                    .setArtworkUri(thumbnail.url.toUri())
-                    .setExtras(
-                        bundleOf(
-                            "albumId" to album.browseId,
-                            "durationText" to durationText,
-                            "artistNames" to authors.map { it.name },
-                            "artistIds" to authors.map { it.browseId },
-                        )
-                    )
-                    .build()
-            )
-            .build()
-    }
 
 @Composable
 fun Song(
@@ -205,7 +148,7 @@ fun Song(
         ) {
         AsyncImage(
             modifier = Modifier.size(50.dp),
-            model = songItem.thumbnail.size(50.dp.toPx().roundToInt()),
+            model = songItem.thumbnail.size(50.dp.toPx.roundToInt()),
             contentDescription = null,
             contentScale = ContentScale.Crop
         )

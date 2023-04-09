@@ -1,8 +1,11 @@
 package com.stslex.smusic
 
 import android.app.Application
+import android.content.Intent
 import com.stslex.core.datastore.appDataStoreModule
 import com.stslex.core.network.di.networkModule
+import com.stslex.core.player.di.playerModule
+import com.stslex.core.player.service.MediaService
 import com.stslex.feature.home.di.homeModule
 import com.stslex.feature.settings.di.settingsModule
 import com.stslex.smusic.di.appModule
@@ -21,9 +24,12 @@ class SMusicApp : Application() {
                 settingsModule,
                 appModule,
                 homeModule,
-                networkModule
+                networkModule,
+                playerModule
             )
         }
+        // TODO only after playing
+        startForegroundService(Intent(this, MediaService::class.java))
         super.onCreate()
     }
 }
