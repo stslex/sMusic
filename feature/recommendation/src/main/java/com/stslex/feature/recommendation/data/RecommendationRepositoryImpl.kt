@@ -5,9 +5,9 @@ import com.stslex.core.network.data.model.page.YoutubePageDataModel
 import com.stslex.core.network.data.model.player.PlayerDataModel
 import kotlinx.coroutines.flow.Flow
 
-class HomeRepositoryImpl(
+class RecommendationRepositoryImpl(
     private val client: YoutubeClient
-) : HomeRepository {
+) : RecommendationRepository {
 
     companion object {
         private const val TOP_CHARTS_ID = "J7p4bzqLvCw"

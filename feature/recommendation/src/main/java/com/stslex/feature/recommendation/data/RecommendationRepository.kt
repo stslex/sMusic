@@ -4,7 +4,7 @@ import com.stslex.core.network.data.model.page.YoutubePageDataModel
 import com.stslex.core.network.data.model.player.PlayerDataModel
 import kotlinx.coroutines.flow.Flow
 
-interface HomeRepository {
+interface RecommendationRepository {
 
     val recommendations: Flow<YoutubePageDataModel>
 

@@ -1,9 +1,7 @@
 package com.stslex.feature.recommendation.di
 
-import com.stslex.core.player.data.MediaServiceRepository
-import com.stslex.core.player.data.MediaServiceRepositoryImpl
-import com.stslex.feature.recommendation.data.HomeRepository
-import com.stslex.feature.recommendation.data.HomeRepositoryImpl
+import com.stslex.feature.recommendation.data.RecommendationRepository
+import com.stslex.feature.recommendation.data.RecommendationRepositoryImpl
 import com.stslex.feature.recommendation.ui.RecommendationViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.bind
@@ -12,6 +10,5 @@ import org.koin.dsl.module
 
 val homeModule = module {
     viewModelOf(::RecommendationViewModel)
-    singleOf(::HomeRepositoryImpl) { bind<HomeRepository>() }
-    singleOf(::MediaServiceRepositoryImpl) { bind<MediaServiceRepository>() }
+    singleOf(::RecommendationRepositoryImpl) { bind<RecommendationRepository>() }
 }

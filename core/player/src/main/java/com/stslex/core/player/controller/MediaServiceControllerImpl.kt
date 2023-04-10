@@ -3,9 +3,6 @@ package com.stslex.core.player.controller
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.stslex.core.network.data.model.page.ItemData
-import com.stslex.core.player.data.MediaServiceRepository
-import com.stslex.core.player.data.mapToMediaItem
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
@@ -13,16 +10,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 class MediaServiceControllerImpl(
     private val player: ExoPlayer,
-    private val mediaServiceRepository: MediaServiceRepository
 ) : MediaServiceController {
 
     private val _simpleMediaState = MutableStateFlow<SimpleMediaState>(SimpleMediaState.Initial)
@@ -33,14 +27,9 @@ class MediaServiceControllerImpl(
     override val playerPlayingState: StateFlow<PlayerPlayingState>
         get() = _playerPlayingState.asStateFlow()
 
-    private val _currentPlayingMedia = MutableStateFlow(player.currentMediaItem)
+    private val _currentPlayingMedia = MutableStateFlow<MediaItem?>(null)
     override val currentPlayingMedia: StateFlow<MediaItem?>
         get() = _currentPlayingMedia.asStateFlow()
-
-    private val MediaItem.networkItem: Flow<MediaItem>
-        get() = mediaServiceRepository
-            .getPlayerData(this)
-            .flowOn(Dispatchers.IO)
 
     private val mediaCache = mutableMapOf<String, Int>()
 
@@ -51,16 +40,9 @@ class MediaServiceControllerImpl(
         job = Job()
     }
 
-    override suspend fun addMediaItem(mediaItem: MediaItem) {
-        mediaItem.networkItem.collect { item ->
-            player.setMediaItem(item)
-            player.prepare()
-        }
-    }
-
-    override suspend fun addMediaItemList(mediaItemList: List<MediaItem>) {
-        player.setMediaItems(mediaItemList)
-        player.prepare()
+    override fun addMediaItem(index: Int, mediaItem: MediaItem) {
+        mediaCache[mediaItem.mediaId] = index
+        player.addMediaItem(index, mediaItem)
     }
 
     override suspend fun onPlayerEvent(playerEvent: PlayerEvent) {
@@ -135,7 +117,7 @@ class MediaServiceControllerImpl(
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
-        _currentPlayingMedia.tryEmit(mediaItem)
+        _currentPlayingMedia.tryEmit(player.currentMediaItem)
     }
 
     private suspend fun startProgressUpdate() = job.run {
@@ -151,21 +133,6 @@ class MediaServiceControllerImpl(
     private fun stopProgressUpdate() {
         job.cancel()
         _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = false)
-    }
-
-    override suspend fun addMediaItems(songItemList: List<ItemData.SongItem>) {
-        songItemList.forEachIndexed { index, songItem ->
-            if (mediaCache.containsKey(songItem.key).not()) {
-                mediaServiceRepository
-                    .getPlayerData(songItem.key)
-                    .flowOn(Dispatchers.IO)
-                    .collect { playerDataModel ->
-                        val mediaItem = songItem.mapToMediaItem(playerDataModel)
-                        mediaCache[songItem.key] = index
-                        player.addMediaItem(index, mediaItem)
-                    }
-            }
-        }
     }
 }
 

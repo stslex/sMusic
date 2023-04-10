@@ -7,15 +7,23 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import com.stslex.core.network.data.model.page.ItemData
+import com.stslex.core.network.data.model.player.PlayerDataModel
 
-val ItemData.SongItem.asMediaItem: MediaItem
-    @OptIn(UnstableApi::class)
-    get() = MediaItem.Builder()
-        .setMediaId(key)
-        .setUri(key)
-        .setCustomCacheKey(key)
-        .setMediaMetadata(asMediaMetadata)
-        .build()
+@OptIn(UnstableApi::class)
+fun ItemData.SongItem.mapToMediaItem(
+    playerDataModel: PlayerDataModel
+): MediaItem = MediaItem.Builder()
+    .setMediaId(key)
+    .setUri(
+        playerDataModel.streamingData
+            .highestQualityFormat
+            ?.url
+            .orEmpty()
+            .toUri()
+    )
+    .setCustomCacheKey(key)
+    .setMediaMetadata(asMediaMetadata)
+    .build()
 
 val ItemData.SongItem.asMediaMetadata: MediaMetadata
     get() = MediaMetadata.Builder()
