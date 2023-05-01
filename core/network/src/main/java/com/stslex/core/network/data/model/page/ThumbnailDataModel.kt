@@ -1,7 +1,7 @@
 package com.stslex.core.network.data.model.page
 
 data class ThumbnailDataModel(
-    val url: String,
+    val url: String = "",
 ) {
 
     companion object {

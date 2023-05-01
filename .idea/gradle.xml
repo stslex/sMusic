@@ -19,7 +19,9 @@
             <option value="$PROJECT_DIR$/core/player" />
             <option value="$PROJECT_DIR$/core/ui" />
             <option value="$PROJECT_DIR$/feature" />
-            <option value="$PROJECT_DIR$/feature/home" />
+            <option value="$PROJECT_DIR$/feature/favourite" />
+            <option value="$PROJECT_DIR$/feature/recommendation" />
+            <option value="$PROJECT_DIR$/feature/search" />
             <option value="$PROJECT_DIR$/feature/settings" />
           </set>
         </option>

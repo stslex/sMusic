@@ -14,13 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.media3.common.MediaItem
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.extensions.animatedBackground
 import com.stslex.smusic.navigation.NavigationHost
-import com.stslex.smusic.navigation.navToSettings
+import com.stslex.smusic.navigation.navigate
 import com.stslex.smusic.screen.appbar.AppTopAppBar
+import com.stslex.smusic.screen.bottom_appbar.AppBottomBar
 import com.stslex.smusic.screen.player.PlayerContainer
 import kotlinx.coroutines.flow.Flow
 import kotlin.reflect.KProperty0
@@ -47,10 +49,17 @@ fun MainScreen(
         topBar = {
             AppTopAppBar(
                 currentRoute = currentRoute.value,
-                navToSettings = navHostController::navToSettings,
+                navToSettings = {
+                    navHostController.navigate(NavigationScreen.Settings)
+                },
                 popBackStack = navHostController::popBackStack
             )
         },
+        bottomBar = {
+            AppBottomBar(
+                onBottomAppBarClick = navHostController::navigate
+            )
+        }
     ) { paddingValues ->
         Box(
             modifier = modifier

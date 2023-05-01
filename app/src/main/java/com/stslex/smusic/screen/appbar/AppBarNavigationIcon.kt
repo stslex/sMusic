@@ -23,7 +23,9 @@ fun AppBarNavigationIcon(
 ) {
     AnimatedVisibility(
         modifier = modifier,
-        visible = currentRoute != NavDestination.HOME.route,
+        visible = currentRoute != NavDestination.RECOMMENDATION.route &&
+                currentRoute != NavDestination.SEARCH.route &&
+                currentRoute != NavDestination.FAVOURITE.route,
         enter = slideInHorizontally(
             animationSpec = tween(300)
         ) { -it },
@@ -45,7 +47,9 @@ fun AppBarNavigationIcon(
     }
     AnimatedVisibility(
         modifier = modifier,
-        visible = currentRoute == NavDestination.HOME.route,
+        visible = currentRoute == NavDestination.RECOMMENDATION.route ||
+                currentRoute == NavDestination.SEARCH.route ||
+                currentRoute == NavDestination.FAVOURITE.route,
         enter = slideInHorizontally(
             animationSpec = tween(300)
         ) { -it },

@@ -15,9 +15,7 @@ interface MediaServiceController : Player.Listener {
 
     val playerPlayingState: StateFlow<PlayerPlayingState>
 
-    suspend fun addMediaItem(mediaItem: MediaItem)
-
-    suspend fun addMediaItemList(mediaItemList: List<MediaItem>)
-
     suspend fun onPlayerEvent(playerEvent: PlayerEvent)
+
+    fun addMediaItem(index: Int, mediaItem: MediaItem)
 }

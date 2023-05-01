@@ -6,5 +6,6 @@ sealed class PlayerEvent {
     object Forward : PlayerEvent()
     object Stop : PlayerEvent()
     object ResumePause : PlayerEvent()
+    data class PlayPauseCurrent(val id: String) : PlayerEvent()
     data class UpdateProgress(val newProgress: Float) : PlayerEvent()
 }

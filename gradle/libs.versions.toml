@@ -14,7 +14,7 @@ composeBom = "2023.04.00"
 activityCompose = "1.7.0"
 viewmodelCompose = "2.6.1"
 
-systemUiController = "0.30.0"
+accompanist = "0.30.0"
 navigationCompose = "2.5.3"
 
 datastore = "1.0.0"
@@ -48,7 +48,9 @@ compose-activity = { group = "androidx.activity", name = "activity-compose", ver
 compose-viewModel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "viewmodelCompose" }
 compose-coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
-accompanist-systemUiController = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "systemUiController" }
+accompanist-systemUiController = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
+accompanist-placeholder = { group = "com.google.accompanist", name = "accompanist-placeholder", version.ref = "accompanist" }
+
 androidx-compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
@@ -97,7 +99,8 @@ compose = [
 ]
 
 accompanist = [
-    "accompanist-systemUiController"
+    "accompanist-systemUiController",
+    "accompanist-placeholder"
 ]
 
 ktor = [
