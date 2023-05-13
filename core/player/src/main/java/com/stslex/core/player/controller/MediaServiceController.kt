@@ -18,4 +18,6 @@ interface MediaServiceController : Player.Listener {
     suspend fun onPlayerEvent(playerEvent: PlayerEvent)
 
     fun addMediaItem(index: Int, mediaItem: MediaItem)
+
+    fun addMediaItems(items: List<MediaItem>)
 }

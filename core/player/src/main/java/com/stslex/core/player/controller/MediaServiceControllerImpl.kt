@@ -6,6 +6,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -45,11 +46,15 @@ class MediaServiceControllerImpl(
         player.addMediaItem(index, mediaItem)
     }
 
+    override fun addMediaItems(items: List<MediaItem>) {
+        items.forEachIndexed(::addMediaItem)
+    }
+
     override suspend fun onPlayerEvent(playerEvent: PlayerEvent) {
         when (playerEvent) {
-            PlayerEvent.Backward -> player.seekBack()
-            PlayerEvent.Forward -> player.seekForward()
-            PlayerEvent.PlayPause -> {
+            is PlayerEvent.Backward -> player.seekBack()
+            is PlayerEvent.Forward -> player.seekForward()
+            is PlayerEvent.PlayPause -> {
                 if (player.isPlaying) {
                     player.pause()
                     stopProgressUpdate()
@@ -60,17 +65,17 @@ class MediaServiceControllerImpl(
                 }
             }
 
-            PlayerEvent.ResumePause -> {
+            is PlayerEvent.ResumePause -> {
                 if (simpleMediaState.value == SimpleMediaState.Initial) {
-                    currentPlayingMedia.value?.let {
-                        player.addMediaItem(it)
+                    currentPlayingMedia.value?.let { currentMedia ->
+                        player.addMediaItem(currentMedia)
                         player.prepare()
                     }
                 }
                 player.playWhenReady = player.playWhenReady.not()
             }
 
-            PlayerEvent.Stop -> stopProgressUpdate()
+            is PlayerEvent.Stop -> stopProgressUpdate()
             is PlayerEvent.UpdateProgress -> player.seekTo((player.duration * playerEvent.newProgress).toLong())
 
             is PlayerEvent.PlayPauseCurrent -> {
@@ -101,6 +106,7 @@ class MediaServiceControllerImpl(
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onIsPlayingChanged(isPlaying: Boolean) {
         _simpleMediaState.value = SimpleMediaState.Playing(isPlaying = isPlaying)
         if (isPlaying) {
