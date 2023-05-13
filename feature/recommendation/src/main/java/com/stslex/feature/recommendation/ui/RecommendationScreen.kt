@@ -47,13 +47,11 @@ fun HomeScreen(
     navigate: (NavigationScreen) -> Unit,
     viewModel: RecommendationViewModel
 ) {
-    val recommendations by remember(viewModel) {
+    val items by remember {
         viewModel.recommendations
-    }.collectAsState(null)
+    }.collectAsState(emptyList())
 
-    val items = recommendations?.songs.orEmpty()
-
-    val currentPlayingMedia by remember(viewModel) {
+    val currentPlayingMedia by remember {
         viewModel.currentPlayingMedia
     }.collectAsState()
 
@@ -61,7 +59,7 @@ fun HomeScreen(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 100.dp)
     ) {
-        if (recommendations == null) {
+        if (items.isEmpty()) {
             items(count = 10) {
                 Song(
                     songItem = ItemData.SongItem(),

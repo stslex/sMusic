@@ -7,10 +7,12 @@ import androidx.media3.session.MediaSession
 import com.stslex.core.player.controller.MediaServiceController
 import com.stslex.core.player.controller.MediaServiceControllerImpl
 import com.stslex.core.player.notification.MediaNotificationManager
+import com.stslex.core.player.notification.MediaNotificationManager.Companion.PENDING_QUALIFIER
 import com.stslex.core.player.notification.MediaNotificationManagerImpl
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val playerModule = module {
@@ -28,7 +30,10 @@ val playerModule = module {
     }
 
     single<MediaSession> {
-        MediaSession.Builder(androidApplication(), get<ExoPlayer>()).build()
+        MediaSession
+            .Builder(androidApplication(), get<ExoPlayer>())
+            .setSessionActivity(get(named(PENDING_QUALIFIER)))
+            .build()
     }
 
     single<MediaNotificationManager> {

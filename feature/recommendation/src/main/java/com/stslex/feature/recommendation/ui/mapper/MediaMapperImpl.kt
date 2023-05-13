@@ -7,15 +7,8 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.stslex.core.network.data.model.page.ItemData
 import com.stslex.core.network.data.model.player.PlayerDataModel
-import com.stslex.feature.recommendation.domain.model.PlayerDomainModel
 
 class MediaMapperImpl : MediaMapper {
-
-    override fun map(
-        items: List<PlayerDomainModel>
-    ): List<MediaItem> = items.map { model ->
-        map(model.songItem, model.playerData)
-    }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun map(

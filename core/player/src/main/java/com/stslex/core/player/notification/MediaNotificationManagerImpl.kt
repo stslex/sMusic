@@ -36,22 +36,22 @@ class MediaNotificationManagerImpl(
 
     @OptIn(UnstableApi::class)
     private fun buildNotification(mediaSession: MediaSession) {
+        val adapter = MediaNotificationAdapter(
+            context = context,
+            pendingIntent = mediaSession.sessionActivity
+        )
         PlayerNotificationManager.Builder(context, NOTIFICATION_ID, NOTIFICATION_CHANNEL_ID)
-            .setMediaDescriptionAdapter(
-                MediaNotificationAdapter(
-                    context = context,
-                    pendingIntent = mediaSession.sessionActivity
-                )
-            )
+            .setMediaDescriptionAdapter(adapter)
             .setSmallIconResourceId(R.drawable.baseline_music_note_24)
             .build()
-            .also {
-                it.setMediaSessionToken(mediaSession.sessionCompatToken)
-                it.setUseFastForwardActionInCompactView(true)
-                it.setUseRewindActionInCompactView(true)
-                it.setUseNextActionInCompactView(false)
-                it.setPriority(NotificationCompat.PRIORITY_LOW)
-                it.setPlayer(player)
+            .apply {
+                setMediaSessionToken(mediaSession.sessionCompatToken)
+                setUseFastForwardActionInCompactView(true)
+                setUseRewindActionInCompactView(true)
+                setUseNextActionInCompactView(true)
+                setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                setUseChronometer(true)
+                setPlayer(player)
             }
     }
 
