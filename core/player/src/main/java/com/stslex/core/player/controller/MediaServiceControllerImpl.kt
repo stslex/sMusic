@@ -54,6 +54,8 @@ class MediaServiceControllerImpl(
         when (playerEvent) {
             is PlayerEvent.Backward -> player.seekBack()
             is PlayerEvent.Forward -> player.seekForward()
+            is PlayerEvent.Next -> player.seekToNext()
+            is PlayerEvent.Previous -> player.seekToPrevious()
             is PlayerEvent.PlayPause -> {
                 if (player.isPlaying) {
                     player.pause()

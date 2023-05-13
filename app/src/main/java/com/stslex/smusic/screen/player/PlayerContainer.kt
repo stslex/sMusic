@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
@@ -28,6 +29,8 @@ import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.components.setStaticPlaceHolder
+import com.stslex.smusic.screen.SwipeAction
+import com.stslex.smusic.screen.swipeAction
 import kotlinx.coroutines.flow.Flow
 import kotlin.reflect.KProperty0
 
@@ -65,7 +68,7 @@ fun PlayerContainer(
             )
             .shadow(
                 elevation = 8.dp,
-                shape = RoundedCornerShape(5.dp)
+                shape = RoundedCornerShape(6.dp)
             )
             .clickable(
                 onClick = {
@@ -73,6 +76,12 @@ fun PlayerContainer(
                 }
             )
             .background(MaterialTheme.colorScheme.surfaceVariant)
+            .swipeAction { action ->
+                when (action) {
+                    SwipeAction.LEFT -> onPlayerClick(PlayerEvent.Previous)
+                    SwipeAction.RIGHT -> onPlayerClick(PlayerEvent.Next)
+                }
+            }
             .then(modifier),
     ) {
         Row(
@@ -82,8 +91,13 @@ fun PlayerContainer(
         ) {
             AsyncImage(
                 modifier = Modifier
-                    .setStaticPlaceHolder(isVisible = isShimmerVisible)
-                    .size(60.dp),
+                    .size(60.dp)
+                    .padding(4.dp)
+                    .shadow(
+                        elevation = 2.dp,
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .setStaticPlaceHolder(isVisible = isShimmerVisible),
                 model = mediaItem?.mediaMetadata?.artworkUri,
                 contentDescription = null,
                 contentScale = ContentScale.Crop
@@ -103,6 +117,7 @@ fun PlayerContainer(
                 onPlayerClick = onPlayerClick
             )
         }
+
         LinearProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
@@ -110,6 +125,7 @@ fun PlayerContainer(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
             progress = playingProgress.progressPercentage,
+            strokeCap = StrokeCap.Round
         )
     }
 }
