@@ -73,7 +73,10 @@ fun PlayerScreen(
             item { Spacer(modifier = Modifier.padding(8.dp)) }
             item {
                 SongProgressBar(
-                    playerPlayingProgress = playerPlayingProgress
+                    playerPlayingProgress = playerPlayingProgress,
+                    updateProgress = { progress ->
+                        onPlayerClick(PlayerEvent.UpdateProgress(progress))
+                    }
                 )
             }
         }

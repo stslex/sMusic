@@ -10,7 +10,7 @@ sealed class SimpleMediaState {
 
     data class Progress(
         private val progress: Long = 0L,
-        private val duration: Long = 0L
+        val duration: Long = 0L
     ) : SimpleMediaState() {
 
         companion object {
