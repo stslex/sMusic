@@ -15,12 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.theme.AppTheme
-import com.stslex.feature.player.ui.components.PlayerControllers
+import com.stslex.feature.player.ui.components.PlayerControllerContainer
 import com.stslex.feature.player.ui.components.SongCover
 import com.stslex.feature.player.ui.components.SongInfoHeader
 import com.stslex.feature.player.ui.components.SongProgressBar
@@ -62,9 +63,9 @@ fun PlayerScreen(
                     artist = mediaItem?.mediaMetadata?.artist?.toString().orEmpty(),
                 )
             }
-            item { Spacer(modifier = Modifier.padding(8.dp)) }
+            item { Spacer(modifier = Modifier.padding(16.dp)) }
             item {
-                PlayerControllers(
+                PlayerControllerContainer(
                     onPlayerClick = onPlayerClick,
                     playerPlayingState = playerPlayingState
                 )
@@ -86,9 +87,15 @@ fun PlayerScreen(
 @Composable
 fun PlayerScreenPreview() {
     AppTheme {
-
+        val metaData = MediaMetadata.Builder()
+            .setArtist("ArtistName")
+            .setTitle("SongTitile")
+            .build()
+        val mediaData = MediaItem.Builder()
+            .setMediaMetadata(metaData)
+            .build()
         PlayerScreen(
-            currentMediaItem = { flowOf<MediaItem?>(null) },
+            currentMediaItem = { flowOf(mediaData) },
             playerPlayingState = { flowOf(PlayerPlayingState.PLAY) },
             playerPlayingProgress = { flowOf(SimpleMediaState.Progress(30, 100)) },
             onPlayerClick = {},
