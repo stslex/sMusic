@@ -49,8 +49,10 @@ fun AppBottomBar(
                     )
                 },
                 label = {
+                    val titleRes =
+                        appBarItem.navDestination.destination.titleRes ?: return@NavigationBarItem
                     Text(
-                        text = stringResource(id = appBarItem.navDestination.destination.titleRes),
+                        text = stringResource(id = titleRes),
                         style = MaterialTheme.typography.titleSmall
                     )
                 },

@@ -1,3 +1,4 @@
+@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
@@ -51,6 +52,7 @@ dependencies {
     implementation(project(":feature:recommendation"))
     implementation(project(":feature:search"))
     implementation(project(":feature:favourite"))
+    implementation(project(":feature:player"))
 
     implementation(libs.bundles.koin)
     implementation(libs.androidx.activity.ktx)

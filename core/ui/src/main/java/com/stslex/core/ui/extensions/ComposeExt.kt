@@ -11,3 +11,10 @@ val Dp.toPx: Float
     get() = with(LocalDensity.current) {
         toPx()
     }
+
+val Int.toDp: Dp
+    @Composable
+    @ReadOnlyComposable
+    get() = with(LocalDensity.current) {
+        toDp()
+    }

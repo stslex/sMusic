@@ -13,9 +13,10 @@ fun AppBarTitle(
     modifier: Modifier = Modifier,
     currentRoute: String
 ) {
+    val titleRes = NavDestination.valueOfRoute(currentRoute).titleRes ?: return
     Text(
         modifier = modifier,
-        text = stringResource(id = NavDestination.valueOfRoute(currentRoute).titleRes),
+        text = stringResource(id = titleRes),
         color = animatedOnSurface().value,
         style = MaterialTheme.typography.displaySmall
     )

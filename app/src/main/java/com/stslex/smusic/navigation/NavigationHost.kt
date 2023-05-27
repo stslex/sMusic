@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import com.stslex.core.navigation.NavDestination
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.feature.favourite.navigation.favouriteGraph
+import com.stslex.feature.player.navigation.playerGraph
 import com.stslex.feature.recommendation.navigation.recommendationGraph
 import com.stslex.feature.search.navigation.searchGraph
 import com.stslex.feature.settings.navigation.settingsGraph
@@ -35,6 +36,10 @@ fun NavigationHost(
             navigate = navController::navigate
         )
         searchGraph(
+            modifier = modifier,
+            navigate = navController::navigate
+        )
+        playerGraph(
             modifier = modifier,
             navigate = navController::navigate
         )

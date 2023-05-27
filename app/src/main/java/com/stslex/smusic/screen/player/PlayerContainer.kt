@@ -40,7 +40,8 @@ fun PlayerContainer(
     currentMediaItem: KProperty0<Flow<MediaItem?>>,
     playerPlayingState: KProperty0<Flow<PlayerPlayingState>>,
     playerPlayingProgress: KProperty0<Flow<SimpleMediaState.Progress>>,
-    onPlayerClick: (PlayerEvent) -> Unit
+    onPlayerClick: (PlayerEvent) -> Unit,
+    onContainerClick: () -> Unit
 ) {
     val mediaItem by remember {
         currentMediaItem.get()
@@ -71,9 +72,7 @@ fun PlayerContainer(
                 shape = RoundedCornerShape(6.dp)
             )
             .clickable(
-                onClick = {
-                    // TODO Open Player View FullScreen
-                }
+                onClick = onContainerClick
             )
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .swipeAction { action ->
