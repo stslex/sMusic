@@ -63,10 +63,16 @@ fun MainScreen(
             AnimatedVisibility(
                 visible = isMainScreen(currentRoute),
                 enter = slideInVertically(
-                    tween(300)
+                    tween(
+                        durationMillis = 300,
+                        delayMillis = 500
+                    )
                 ) { it },
                 exit = slideOutVertically(
-                    tween(300)
+                    tween(
+                        durationMillis = 300,
+                        delayMillis = 500
+                    )
                 ) { it }
             ) {
                 AppBottomBar(
@@ -94,10 +100,16 @@ fun MainScreen(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 visible = isMainScreen(currentRoute),
                 enter = slideInVertically(
-                    tween(300)
+                    tween(
+                        durationMillis = 300,
+                        delayMillis = 500
+                    )
                 ) { it + bottomPadding },
                 exit = slideOutVertically(
-                    tween(300)
+                    tween(
+                        durationMillis = 300,
+                        delayMillis = 500
+                    )
                 ) { it + bottomPadding }
             ) {
                 PlayerContainer(

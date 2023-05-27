@@ -1,17 +1,24 @@
 package com.stslex.feature.player.ui
 
 import android.content.res.Configuration
+import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
@@ -35,6 +42,8 @@ fun PlayerScreen(
     navigate: (NavigationScreen) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val localConfiguration = LocalConfiguration.current
+
     val mediaItem by remember {
         currentMediaItem()
     }.collectAsState()
@@ -43,13 +52,93 @@ fun PlayerScreen(
         simpleMediaState()
     }.collectAsState()
 
-    Scaffold(
-        modifier = modifier.fillMaxSize()
-    ) { paddingValues ->
+    if (localConfiguration.orientation == ORIENTATION_LANDSCAPE) {
+        PlayerScreenLandscape(
+            mediaItem = mediaItem,
+            mediaState = mediaState,
+            onPlayerClick = onPlayerClick,
+            navigate = navigate,
+            modifier = modifier
+        )
+    } else {
+        PlayerScreenPortrait(
+            mediaItem = mediaItem,
+            mediaState = mediaState,
+            onPlayerClick = onPlayerClick,
+            navigate = navigate,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+fun PlayerScreenLandscape(
+    mediaItem: MediaItem?,
+    mediaState: SimpleMediaState,
+    onPlayerClick: (PlayerEvent) -> Unit,
+    navigate: (NavigationScreen) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+            .padding(32.dp)
+    ) {
+        SongCover(
+            uri = mediaItem?.mediaMetadata?.artworkUri
+        )
+        Spacer(modifier = Modifier.padding(8.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1f)
+        ) {
+            Column(
+                modifier = Modifier.align(Alignment.TopCenter)
+            ) {
+                SongInfoHeader(
+                    song = mediaItem?.mediaMetadata?.title?.toString().orEmpty(),
+                    artist = mediaItem?.mediaMetadata?.artist?.toString().orEmpty(),
+                )
+                Spacer(modifier = Modifier.padding(16.dp))
+            }
+
+            Column(
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) {
+                PlayerControllerContainer(
+                    onPlayerClick = onPlayerClick,
+                    playerPlayingState = mediaState.playerPlayingState
+                )
+                Spacer(modifier = Modifier.padding(8.dp))
+                SongProgressBar(
+                    mediaState = mediaState,
+                    updateProgress = { progress ->
+                        onPlayerClick(PlayerEvent.UpdateProgress(progress))
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PlayerScreenPortrait(
+    mediaItem: MediaItem?,
+    mediaState: SimpleMediaState,
+    onPlayerClick: (PlayerEvent) -> Unit,
+    navigate: (NavigationScreen) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
