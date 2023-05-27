@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -23,20 +20,13 @@ import androidx.compose.ui.unit.dp
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.components.AnimateProgressbar
 import com.stslex.core.ui.theme.AppTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun SongProgressBar(
-    playerPlayingProgress: () -> Flow<SimpleMediaState.Progress>,
+    mediaState: SimpleMediaState,
     updateProgress: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val playingProgress by remember {
-        playerPlayingProgress()
-    }.collectAsState(
-        initial = SimpleMediaState.Progress()
-    )
 
     BoxWithConstraints(
         modifier = modifier
@@ -52,7 +42,7 @@ fun SongProgressBar(
                         updateProgress(singleSize)
                     }
                 },
-                progress = playingProgress.progressPercentage,
+                progress = mediaState.progressPercentage,
             )
 
             Spacer(modifier = Modifier.padding(4.dp))
@@ -61,14 +51,14 @@ fun SongProgressBar(
             ) {
                 Text(
                     modifier = Modifier.align(Alignment.BottomStart),
-                    text = playingProgress.currentProgress,
+                    text = mediaState.currentProgress,
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Text(
                     modifier = Modifier.align(Alignment.BottomEnd),
-                    text = playingProgress.currentDuration,
+                    text = mediaState.currentDuration,
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -91,14 +81,7 @@ fun SongProgressBarPreview() {
             contentAlignment = Alignment.Center,
         ) {
             SongProgressBar(
-                playerPlayingProgress = {
-                    flowOf(
-                        SimpleMediaState.Progress(
-                            progress = 30L,
-                            duration = 100L
-                        )
-                    )
-                },
+                mediaState = SimpleMediaState(),
                 updateProgress = {}
             )
         }

@@ -18,28 +18,30 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.player.model.PlayerEvent
-import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.theme.AppTheme
 import com.stslex.feature.player.ui.components.PlayerControllerContainer
 import com.stslex.feature.player.ui.components.SongCover
 import com.stslex.feature.player.ui.components.SongInfoHeader
 import com.stslex.feature.player.ui.components.SongProgressBar
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun PlayerScreen(
-    currentMediaItem: () -> Flow<MediaItem?>,
-    playerPlayingState: () -> Flow<PlayerPlayingState>,
-    playerPlayingProgress: () -> Flow<SimpleMediaState.Progress>,
+    currentMediaItem: () -> StateFlow<MediaItem?>,
+    simpleMediaState: () -> StateFlow<SimpleMediaState>,
     onPlayerClick: (PlayerEvent) -> Unit,
     navigate: (NavigationScreen) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val mediaItem by remember {
         currentMediaItem()
-    }.collectAsState(initial = null)
+    }.collectAsState()
+
+    val mediaState by remember {
+        simpleMediaState()
+    }.collectAsState()
 
     Scaffold(
         modifier = modifier.fillMaxSize()
@@ -67,13 +69,13 @@ fun PlayerScreen(
             item {
                 PlayerControllerContainer(
                     onPlayerClick = onPlayerClick,
-                    playerPlayingState = playerPlayingState
+                    playerPlayingState = mediaState.playerPlayingState
                 )
             }
             item { Spacer(modifier = Modifier.padding(8.dp)) }
             item {
                 SongProgressBar(
-                    playerPlayingProgress = playerPlayingProgress,
+                    mediaState = mediaState,
                     updateProgress = { progress ->
                         onPlayerClick(PlayerEvent.UpdateProgress(progress))
                     }
@@ -98,9 +100,8 @@ fun PlayerScreenPreview() {
             .setMediaMetadata(metaData)
             .build()
         PlayerScreen(
-            currentMediaItem = { flowOf(mediaData) },
-            playerPlayingState = { flowOf(PlayerPlayingState.PLAY) },
-            playerPlayingProgress = { flowOf(SimpleMediaState.Progress(30, 100)) },
+            currentMediaItem = { MutableStateFlow(mediaData) },
+            simpleMediaState = { MutableStateFlow(SimpleMediaState()) },
             onPlayerClick = {},
             navigate = {}
         )

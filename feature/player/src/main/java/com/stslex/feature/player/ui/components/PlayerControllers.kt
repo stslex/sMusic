@@ -23,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,13 +34,11 @@ import androidx.compose.ui.unit.dp
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.ui.theme.AppTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun PlayerControllerContainer(
     onPlayerClick: (PlayerEvent) -> Unit,
-    playerPlayingState: () -> Flow<PlayerPlayingState>,
+    playerPlayingState: PlayerPlayingState,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -78,7 +75,7 @@ fun PlayerControllerContainer(
 @Composable
 fun PlayerController(
     onPlayerClick: (PlayerEvent) -> Unit,
-    playerPlayingState: () -> Flow<PlayerPlayingState>,
+    playerPlayingState: PlayerPlayingState,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -108,7 +105,7 @@ fun PlayerController(
                 onClick = remember {
                     { onPlayerClick(PlayerEvent.ResumePause) }
                 },
-                playerPlayingState = playerPlayingState
+                playingState = playerPlayingState
             )
 
             Spacer(modifier = Modifier.padding(horizontal = 8.dp))
@@ -131,14 +128,9 @@ fun PlayerController(
 @Composable
 fun PlayerControllerPlay(
     onClick: () -> Unit,
-    playerPlayingState: () -> Flow<PlayerPlayingState>,
+    playingState: PlayerPlayingState,
     modifier: Modifier = Modifier
 ) {
-    val playingState by remember {
-        playerPlayingState()
-    }.collectAsState(
-        initial = PlayerPlayingState.PAUSE
-    )
 
     val shapePercent by animateIntAsState(
         targetValue = when (playingState) {
@@ -200,7 +192,8 @@ fun PlayerControllersPreview() {
         ) {
             PlayerControllerContainer(
                 onPlayerClick = {},
-                playerPlayingState = { flowOf(PlayerPlayingState.PAUSE) })
+                playerPlayingState = PlayerPlayingState.PAUSE,
+            )
         }
     }
 }

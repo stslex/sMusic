@@ -47,8 +47,7 @@ class MainActivity : AppCompatActivity() {
                     navHostController = navHostController,
                     currentMediaItem = viewModel::currentMediaItem,
                     onPlayerClick = viewModel::onPlayerClick,
-                    playerPlayingState = viewModel::playerPlayingState,
-                    playerPlayingProgress = viewModel::mediaProgress
+                    simpleMediaState = viewModel::simpleMediaState,
                 )
             }
         }

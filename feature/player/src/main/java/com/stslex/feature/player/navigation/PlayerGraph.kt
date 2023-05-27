@@ -17,8 +17,7 @@ fun NavGraphBuilder.playerGraph(
         val viewModel = koinViewModel<PlayerViewModel>()
         PlayerScreen(
             currentMediaItem = viewModel::currentMediaItem,
-            playerPlayingState = viewModel::playerPlayingState,
-            playerPlayingProgress = viewModel::mediaProgress,
+            simpleMediaState = viewModel::simpleMediaState,
             onPlayerClick = viewModel::onPlayerClick,
             navigate = navigate,
             modifier = modifier,
