@@ -5,7 +5,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
-import com.stslex.core.player.notification.MediaNotificationManager
+import com.stslex.core.player.notification.manager.MediaNotificationManager
 import org.koin.android.ext.android.inject
 
 class MediaService : MediaSessionService() {
@@ -28,11 +28,9 @@ class MediaService : MediaSessionService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaSession.run {
-            release()
-            if (exoPlayer.playbackState != Player.STATE_IDLE) {
-                exoPlayer.release()
-            }
+        mediaSession.release()
+        if (exoPlayer.playbackState != Player.STATE_IDLE) {
+            exoPlayer.release()
         }
     }
 }

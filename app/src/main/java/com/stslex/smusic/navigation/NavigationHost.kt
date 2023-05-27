@@ -1,9 +1,11 @@
 package com.stslex.smusic.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
 import com.stslex.core.navigation.NavDestination
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.feature.favourite.navigation.favouriteGraph
@@ -12,13 +14,14 @@ import com.stslex.feature.recommendation.navigation.recommendationGraph
 import com.stslex.feature.search.navigation.searchGraph
 import com.stslex.feature.settings.navigation.settingsGraph
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavigationHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: String = NavDestination.RECOMMENDATION.route
 ) {
-    NavHost(
+    AnimatedNavHost(
         modifier = modifier,
         navController = navController,
         startDestination = startDestination,

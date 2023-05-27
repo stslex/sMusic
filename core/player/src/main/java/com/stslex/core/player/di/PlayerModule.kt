@@ -6,9 +6,13 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import com.stslex.core.player.controller.MediaServiceController
 import com.stslex.core.player.controller.MediaServiceControllerImpl
-import com.stslex.core.player.notification.MediaNotificationManager
-import com.stslex.core.player.notification.MediaNotificationManager.Companion.PENDING_QUALIFIER
-import com.stslex.core.player.notification.MediaNotificationManagerImpl
+import com.stslex.core.player.image_loader.AppImageLoader
+import com.stslex.core.player.image_loader.AppImageLoaderImpl
+import com.stslex.core.player.notification.adapter.MediaNotificationAdapterFactory
+import com.stslex.core.player.notification.adapter.MediaNotificationAdapterFactoryImpl
+import com.stslex.core.player.notification.manager.MediaNotificationManager
+import com.stslex.core.player.notification.manager.MediaNotificationManager.Companion.PENDING_QUALIFIER
+import com.stslex.core.player.notification.manager.MediaNotificationManagerImpl
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -39,9 +43,18 @@ val corePlayerModule = module {
     single<MediaNotificationManager> {
         MediaNotificationManagerImpl(
             context = androidApplication(),
-            player = get<ExoPlayer>()
+            player = get<ExoPlayer>(),
+            notificationFactory = get<MediaNotificationAdapterFactory>()
         )
     }
 
+    singleOf(::MediaNotificationAdapterFactoryImpl) {
+        bind<MediaNotificationAdapterFactory>()
+    }
+
     singleOf(::MediaServiceControllerImpl) { bind<MediaServiceController>() }
+
+    single<AppImageLoader> {
+        AppImageLoaderImpl(androidApplication())
+    }
 }

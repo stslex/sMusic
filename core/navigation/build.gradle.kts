@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    api(libs.androidx.compose.navigation)
+    api(libs.accompanist.navigation)
 
     implementation(libs.core.ktx)
     implementation(libs.appcompat)

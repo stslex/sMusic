@@ -28,6 +28,7 @@ import com.stslex.smusic.navigation.NavigationHost
 import com.stslex.smusic.navigation.navigate
 import com.stslex.smusic.screen.appbar.AppTopAppBar
 import com.stslex.smusic.screen.bottom_appbar.AppBottomBar
+import com.stslex.smusic.screen.bottom_appbar.BottomAppbarItem
 import com.stslex.smusic.screen.player.PlayerContainer
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.reflect.KProperty0
@@ -69,7 +70,8 @@ fun MainScreen(
                 ) { it }
             ) {
                 AppBottomBar(
-                    onBottomAppBarClick = navHostController::navigate
+                    onBottomAppBarClick = navHostController::navigate,
+                    selectedItem = BottomAppbarItem.getByRoute(currentRoute)
                 )
             }
         }
