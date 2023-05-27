@@ -48,4 +48,8 @@ dependencies {
 
     implementation(libs.bundles.koin)
     implementation(libs.bundles.ktor)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 }
