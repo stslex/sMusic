@@ -1,24 +1,31 @@
 package com.stslex.core.player.model
 
-sealed class SimpleMediaState {
+import androidx.compose.runtime.Stable
 
-    object Initial : SimpleMediaState()
+@Stable
+data class SimpleMediaState(
+    val duration: Long = 0L,
+    val progress: Long = 0L,
+    val isPlaying: Boolean = false,
+    val playerState: PlayerState = PlayerState.Initial
+) {
 
-    data class Ready(val duration: Long) : SimpleMediaState()
+    val playerPlayingState: PlayerPlayingState
+        get() = if (isPlaying) {
+            PlayerPlayingState.PLAY
+        } else {
+            PlayerPlayingState.PAUSE
+        }
 
-    data class Progress(
-        val progress: Long = 0L,
-        val duration: Long = 0L
-    ) : SimpleMediaState() {
+    val progressPercentage: Float
+        get() = PlayerProgressUtils.progressPercentage(
+            progress = progress,
+            duration = duration
+        )
 
-        val progressPercentage: Float
-            get() = if (progress == 0L || duration == 0L) {
-                0f
-            } else {
-                progress.toFloat() / duration.toFloat()
-            }
-    }
+    val currentProgress: String
+        get() = PlayerProgressUtils.getTime(progress)
 
-    data class Buffering(val progress: Long) : SimpleMediaState()
-    data class Playing(val isPlaying: Boolean) : SimpleMediaState()
+    val currentDuration: String
+        get() = PlayerProgressUtils.getTime(duration)
 }

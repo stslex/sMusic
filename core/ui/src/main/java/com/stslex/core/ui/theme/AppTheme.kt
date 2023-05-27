@@ -3,6 +3,7 @@ package com.stslex.core.ui.theme
 import android.content.Context
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +45,7 @@ private val currentColorScheme: (isDarkTheme: Boolean) -> ColorScheme
     }
 
 private val Context.currentDynamicColorScheme: (isDarkTheme: Boolean) -> ColorScheme
+    @RequiresApi(Build.VERSION_CODES.S)
     get() = { isDarkTheme ->
         if (isDarkTheme) {
             dynamicDarkColorScheme(this)

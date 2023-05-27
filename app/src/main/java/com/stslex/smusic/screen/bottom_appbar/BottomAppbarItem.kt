@@ -29,5 +29,15 @@ enum class BottomAppbarItem(
         navDestination = NavigationScreen.Favourite,
         unselectedIcon = Icons.Outlined.FavoriteBorder,
         selectedIcon = Icons.Filled.Favorite,
-    )
+    );
+
+    companion object {
+
+        fun getByRoute(
+            route: String
+        ): BottomAppbarItem? = BottomAppbarItem.values()
+            .firstOrNull { item ->
+                item.navDestination.destination.route == route
+            }
+    }
 }

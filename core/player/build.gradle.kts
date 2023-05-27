@@ -1,3 +1,4 @@
+@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.org.jetbrains.kotlin.android)
@@ -37,9 +38,7 @@ dependencies {
     implementation(libs.bundles.koin)
     api(libs.bundles.media3)
 
-    implementation("com.github.bumptech.glide:glide:4.15.1")
-    implementation ("androidx.media:media:1.6.0")
-
+    implementation(libs.compose.coil)
     implementation(libs.core.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

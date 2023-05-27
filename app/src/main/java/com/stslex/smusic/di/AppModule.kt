@@ -2,7 +2,7 @@ package com.stslex.smusic.di
 
 import android.app.PendingIntent
 import android.content.Intent
-import com.stslex.core.player.notification.MediaNotificationManager.Companion.PENDING_QUALIFIER
+import com.stslex.core.player.notification.manager.MediaNotificationManager.Companion.PENDING_QUALIFIER
 import com.stslex.smusic.MainActivity
 import com.stslex.smusic.MainActivityViewModel
 import org.koin.android.ext.koin.androidApplication

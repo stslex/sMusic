@@ -1,4 +1,4 @@
-package com.stslex.core.player.notification
+package com.stslex.core.player.notification.manager
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -13,10 +13,12 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.ui.PlayerNotificationManager
 import com.stslex.core.player.R
+import com.stslex.core.player.notification.adapter.MediaNotificationAdapterFactory
 
 class MediaNotificationManagerImpl(
     private val context: Context,
-    private val player: ExoPlayer
+    private val player: ExoPlayer,
+    private val notificationFactory: MediaNotificationAdapterFactory
 ) : MediaNotificationManager {
 
     private var notificationManager: NotificationManagerCompat =
@@ -36,10 +38,7 @@ class MediaNotificationManagerImpl(
 
     @OptIn(UnstableApi::class)
     private fun buildNotification(mediaSession: MediaSession) {
-        val adapter = MediaNotificationAdapter(
-            context = context,
-            pendingIntent = mediaSession.sessionActivity
-        )
+        val adapter = notificationFactory(mediaSession.sessionActivity)
         PlayerNotificationManager.Builder(context, NOTIFICATION_ID, NOTIFICATION_CHANNEL_ID)
             .setMediaDescriptionAdapter(adapter)
             .setSmallIconResourceId(R.drawable.baseline_music_note_24)

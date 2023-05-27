@@ -1,4 +1,4 @@
-package com.stslex.core.player.notification
+package com.stslex.core.player.notification.manager
 
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService

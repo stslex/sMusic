@@ -26,33 +26,28 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
 import coil.compose.AsyncImage
 import com.stslex.core.player.model.PlayerEvent
-import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.components.setStaticPlaceHolder
 import com.stslex.smusic.screen.SwipeAction
 import com.stslex.smusic.screen.swipeAction
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlin.reflect.KProperty0
 
 @Composable
 fun PlayerContainer(
     modifier: Modifier = Modifier,
-    currentMediaItem: KProperty0<Flow<MediaItem?>>,
-    playerPlayingState: KProperty0<Flow<PlayerPlayingState>>,
-    playerPlayingProgress: KProperty0<Flow<SimpleMediaState.Progress>>,
-    onPlayerClick: (PlayerEvent) -> Unit
+    currentMediaItem: KProperty0<StateFlow<MediaItem?>>,
+    simpleMediaState: KProperty0<StateFlow<SimpleMediaState>>,
+    onPlayerClick: (PlayerEvent) -> Unit,
+    onContainerClick: () -> Unit
 ) {
     val mediaItem by remember {
         currentMediaItem.get()
-    }.collectAsState(initial = null)
+    }.collectAsState()
 
-    val playingState by remember {
-        playerPlayingState.get()
-    }.collectAsState(initial = PlayerPlayingState.PAUSE)
-
-    val playingProgress by remember {
-        playerPlayingProgress.get()
-    }.collectAsState(initial = SimpleMediaState.Progress(0L))
+    val mediaState by remember {
+        simpleMediaState.get()
+    }.collectAsState()
 
     val isShimmerVisible by remember {
         derivedStateOf { mediaItem == null }
@@ -71,9 +66,7 @@ fun PlayerContainer(
                 shape = RoundedCornerShape(6.dp)
             )
             .clickable(
-                onClick = {
-                    // TODO Open Player View FullScreen
-                }
+                onClick = onContainerClick
             )
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .swipeAction { action ->
@@ -113,7 +106,7 @@ fun PlayerContainer(
             PlayerPausePlayButton(
                 modifier = Modifier
                     .align(Alignment.CenterVertically),
-                playerPlayingState = playingState,
+                playerPlayingState = mediaState.playerPlayingState,
                 onPlayerClick = onPlayerClick
             )
         }
@@ -124,7 +117,7 @@ fun PlayerContainer(
                 .height(4.dp),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            progress = playingProgress.progressPercentage,
+            progress = mediaState.progressPercentage,
             strokeCap = StrokeCap.Round
         )
     }
