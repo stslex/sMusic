@@ -10,6 +10,8 @@ interface MediaServiceController : Player.Listener {
 
     val simpleMediaState: StateFlow<SimpleMediaState>
 
+    val allMediaItems: StateFlow<List<MediaItem>>
+
     val currentPlayingMedia: StateFlow<MediaItem?>
 
     suspend fun onPlayerEvent(playerEvent: PlayerEvent)

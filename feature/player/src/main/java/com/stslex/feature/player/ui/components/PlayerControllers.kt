@@ -37,7 +37,7 @@ import com.stslex.core.ui.theme.AppTheme
 
 @Composable
 fun PlayerControllerContainer(
-    onPlayerClick: (PlayerEvent) -> Unit,
+    sendPlayerEvent: (PlayerEvent) -> Unit,
     playerPlayingState: PlayerPlayingState,
     modifier: Modifier = Modifier
 ) {
@@ -56,7 +56,7 @@ fun PlayerControllerContainer(
 
         PlayerController(
             modifier = Modifier.weight(1f),
-            onPlayerClick = onPlayerClick,
+            onPlayerClick = sendPlayerEvent,
             playerPlayingState = playerPlayingState
         )
 
@@ -191,7 +191,7 @@ fun PlayerControllersPreview() {
             contentAlignment = Alignment.Center
         ) {
             PlayerControllerContainer(
-                onPlayerClick = {},
+                sendPlayerEvent = {},
                 playerPlayingState = PlayerPlayingState.PAUSE,
             )
         }

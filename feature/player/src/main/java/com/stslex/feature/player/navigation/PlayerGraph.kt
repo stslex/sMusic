@@ -36,6 +36,7 @@ fun NavGraphBuilder.playerGraph(
         PlayerScreen(
             currentMediaItem = viewModel::currentMediaItem,
             simpleMediaState = viewModel::simpleMediaState,
+            allMediaItems = viewModel::allMediaItems,
             onPlayerClick = viewModel::onPlayerClick,
             navigate = navigate,
             modifier = modifier,

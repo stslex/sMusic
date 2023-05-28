@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.StateFlow
 fun PlayerScreen(
     currentMediaItem: () -> StateFlow<MediaItem?>,
     simpleMediaState: () -> StateFlow<SimpleMediaState>,
+    allMediaItems: () -> StateFlow<List<MediaItem>>,
     onPlayerClick: (PlayerEvent) -> Unit,
     navigate: (NavigationScreen) -> Unit,
     modifier: Modifier = Modifier,
@@ -52,11 +53,16 @@ fun PlayerScreen(
         simpleMediaState()
     }.collectAsState()
 
+    val mediaItems by remember {
+        allMediaItems()
+    }.collectAsState()
+
     if (localConfiguration.orientation == ORIENTATION_LANDSCAPE) {
         PlayerScreenLandscape(
             mediaItem = mediaItem,
             mediaState = mediaState,
-            onPlayerClick = onPlayerClick,
+            allMediaItems = mediaItems,
+            sendPlayerEvent = onPlayerClick,
             navigate = navigate,
             modifier = modifier
         )
@@ -64,7 +70,8 @@ fun PlayerScreen(
         PlayerScreenPortrait(
             mediaItem = mediaItem,
             mediaState = mediaState,
-            onPlayerClick = onPlayerClick,
+            allMediaItems = mediaItems,
+            sendPlayerEvent = onPlayerClick,
             navigate = navigate,
             modifier = modifier
         )
@@ -75,7 +82,8 @@ fun PlayerScreen(
 fun PlayerScreenLandscape(
     mediaItem: MediaItem?,
     mediaState: SimpleMediaState,
-    onPlayerClick: (PlayerEvent) -> Unit,
+    allMediaItems: List<MediaItem>,
+    sendPlayerEvent: (PlayerEvent) -> Unit,
     navigate: (NavigationScreen) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -83,16 +91,18 @@ fun PlayerScreenLandscape(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
-            .padding(32.dp)
     ) {
         SongCover(
-            uri = mediaItem?.mediaMetadata?.artworkUri
+            currentId = mediaItem?.mediaId.orEmpty(),
+            allMediaItems = allMediaItems,
+            sendPlayerEvent = sendPlayerEvent
         )
         Spacer(modifier = Modifier.padding(8.dp))
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
+                .padding(32.dp)
         ) {
             Column(
                 modifier = Modifier.align(Alignment.TopCenter)
@@ -108,14 +118,14 @@ fun PlayerScreenLandscape(
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
                 PlayerControllerContainer(
-                    onPlayerClick = onPlayerClick,
+                    sendPlayerEvent = sendPlayerEvent,
                     playerPlayingState = mediaState.playerPlayingState
                 )
                 Spacer(modifier = Modifier.padding(8.dp))
                 SongProgressBar(
                     mediaState = mediaState,
                     updateProgress = { progress ->
-                        onPlayerClick(PlayerEvent.UpdateProgress(progress))
+                        sendPlayerEvent(PlayerEvent.UpdateProgress(progress))
                     }
                 )
             }
@@ -127,7 +137,8 @@ fun PlayerScreenLandscape(
 fun PlayerScreenPortrait(
     mediaItem: MediaItem?,
     mediaState: SimpleMediaState,
-    onPlayerClick: (PlayerEvent) -> Unit,
+    allMediaItems: List<MediaItem>,
+    sendPlayerEvent: (PlayerEvent) -> Unit,
     navigate: (NavigationScreen) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -139,17 +150,21 @@ fun PlayerScreenPortrait(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
                 SongCover(
-                    uri = mediaItem?.mediaMetadata?.artworkUri
+                    currentId = mediaItem?.mediaId.orEmpty(),
+                    allMediaItems = allMediaItems,
+                    sendPlayerEvent = sendPlayerEvent
                 )
             }
             item { Spacer(modifier = Modifier.padding(8.dp)) }
             item {
                 SongInfoHeader(
+                    modifier = Modifier
+                        .padding(horizontal = 32.dp),
                     song = mediaItem?.mediaMetadata?.title?.toString().orEmpty(),
                     artist = mediaItem?.mediaMetadata?.artist?.toString().orEmpty(),
                 )
@@ -157,16 +172,20 @@ fun PlayerScreenPortrait(
             item { Spacer(modifier = Modifier.padding(16.dp)) }
             item {
                 PlayerControllerContainer(
-                    onPlayerClick = onPlayerClick,
+                    modifier = Modifier
+                        .padding(horizontal = 32.dp),
+                    sendPlayerEvent = sendPlayerEvent,
                     playerPlayingState = mediaState.playerPlayingState
                 )
             }
             item { Spacer(modifier = Modifier.padding(8.dp)) }
             item {
                 SongProgressBar(
+                    modifier = Modifier
+                        .padding(horizontal = 32.dp),
                     mediaState = mediaState,
                     updateProgress = { progress ->
-                        onPlayerClick(PlayerEvent.UpdateProgress(progress))
+                        sendPlayerEvent(PlayerEvent.UpdateProgress(progress))
                     }
                 )
             }
@@ -191,6 +210,7 @@ fun PlayerScreenPreview() {
         PlayerScreen(
             currentMediaItem = { MutableStateFlow(mediaData) },
             simpleMediaState = { MutableStateFlow(SimpleMediaState()) },
+            allMediaItems = { MutableStateFlow(emptyList()) },
             onPlayerClick = {},
             navigate = {}
         )
