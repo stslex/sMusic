@@ -36,13 +36,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.MediaItem
 import coil.compose.AsyncImage
 import com.stslex.core.navigation.NavigationScreen
-import com.stslex.core.network.data.model.page.ItemData
 import com.stslex.core.ui.components.setDynamicPlaceHolder
 import com.stslex.core.ui.extensions.animatedOnBackground
 import com.stslex.core.ui.extensions.toPx
-import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(
@@ -75,7 +74,7 @@ fun HomeScreen(
         if (items.isEmpty()) {
             items(count = 10) {
                 Song(
-                    songItem = ItemData.SongItem(),
+                    songItem = MediaItem.EMPTY,
                     onClick = {},
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.surface),
@@ -85,16 +84,16 @@ fun HomeScreen(
         } else {
             items(
                 items = items,
-                key = { item -> item.key }
+                key = { item -> item.mediaId }
             ) { item ->
                 Song(
                     songItem = item,
                     onClick = {
-                        viewModel.play(item.key)
+                        viewModel.play(item.mediaId)
                     },
                     modifier = Modifier
                         .background(
-                            if (currentPlayingMedia?.mediaId == item.key) {
+                            if (currentPlayingMedia?.mediaId == item.mediaId) {
                                 MaterialTheme.colorScheme.surfaceVariant
                             } else {
                                 MaterialTheme.colorScheme.surface
@@ -109,7 +108,7 @@ fun HomeScreen(
 @Composable
 fun Song(
     modifier: Modifier = Modifier,
-    songItem: ItemData.SongItem,
+    songItem: MediaItem,
     onClick: () -> Unit,
     isPlaceHolder: Boolean = false
 ) {
@@ -133,7 +132,7 @@ fun Song(
             modifier = Modifier
                 .setDynamicPlaceHolder(isVisible = isPlaceHolder)
                 .size(50.dp),
-            model = songItem.thumbnail.size(50.dp.toPx.roundToInt()),
+            model = songItem.mediaMetadata.artworkUri,
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
@@ -153,10 +152,7 @@ fun Song(
                     modifier = Modifier
                         .fillMaxWidth()
                         .setDynamicPlaceHolder(isVisible = isPlaceHolder),
-                    text = songItem.authors
-                        .joinToString {
-                            it.name.plus(" ")
-                        },
+                    text = songItem.mediaMetadata.artist?.toString().orEmpty(),
                     style = MaterialTheme.typography.titleMedium,
                     color = animatedOnBackground().value,
                     overflow = TextOverflow.Ellipsis
@@ -166,7 +162,7 @@ fun Song(
                     modifier = Modifier
                         .fillMaxWidth()
                         .setDynamicPlaceHolder(isVisible = isPlaceHolder),
-                    text = songItem.info.name,
+                    text = songItem.mediaMetadata.title?.toString().orEmpty(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = animatedOnBackground().value,
                     overflow = TextOverflow.Ellipsis
