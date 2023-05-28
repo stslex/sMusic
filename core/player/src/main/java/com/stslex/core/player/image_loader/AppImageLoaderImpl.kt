@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -25,8 +26,12 @@ class AppImageLoaderImpl(
         val imageLoader = ImageLoader(context)
         val imageRequest = ImageRequest.Builder(context)
             .data(uri)
+            .placeholderMemoryCacheKey(uri.toString())
             .memoryCacheKey(uri.toString())
             .diskCacheKey(uri.toString())
+            .networkCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
             .build()
 
         loadJob.cancel()

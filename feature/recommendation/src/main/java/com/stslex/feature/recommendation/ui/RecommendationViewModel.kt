@@ -25,7 +25,7 @@ class RecommendationViewModel(
     private val mapper: MediaMapper
 ) : ViewModel() {
 
-    init {
+    fun init(size: Int) {
         interactor.recommendations
             .flowOn(Dispatchers.IO)
             .onEach { recommendations ->
@@ -35,7 +35,11 @@ class RecommendationViewModel(
                         interactor
                             .getPlayerData(songItem.key)
                             .map { playerData ->
-                                mapper.map(songItem, playerData)
+                                mapper.map(
+                                    item = songItem,
+                                    playerData = playerData,
+                                    size = size
+                                )
                             }
                     }
                     .asFlowList()

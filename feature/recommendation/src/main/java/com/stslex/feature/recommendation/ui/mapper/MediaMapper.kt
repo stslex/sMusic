@@ -8,6 +8,7 @@ interface MediaMapper {
 
     fun map(
         item: ItemData.SongItem,
-        playerData: PlayerDataModel
+        playerData: PlayerDataModel,
+        size: Int
     ): MediaItem
 }
