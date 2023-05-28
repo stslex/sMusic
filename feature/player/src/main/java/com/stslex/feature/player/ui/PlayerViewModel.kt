@@ -19,6 +19,9 @@ class PlayerViewModel(
     val simpleMediaState: StateFlow<SimpleMediaState>
         get() = mediaController.simpleMediaState
 
+    val allMediaItems: StateFlow<List<MediaItem>>
+        get() = mediaController.allMediaItems
+
     fun onPlayerClick(event: PlayerEvent) {
         viewModelScope.launch {
             mediaController.onPlayerEvent(event)

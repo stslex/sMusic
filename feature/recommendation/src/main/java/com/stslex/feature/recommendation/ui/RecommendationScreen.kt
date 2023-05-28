@@ -1,5 +1,6 @@
 package com.stslex.feature.recommendation.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -31,15 +33,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.MediaItem
 import coil.compose.AsyncImage
 import com.stslex.core.navigation.NavigationScreen
-import com.stslex.core.network.data.model.page.ItemData
 import com.stslex.core.ui.components.setDynamicPlaceHolder
 import com.stslex.core.ui.extensions.animatedOnBackground
 import com.stslex.core.ui.extensions.toPx
-import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(
@@ -47,6 +49,16 @@ fun HomeScreen(
     navigate: (NavigationScreen) -> Unit,
     viewModel: RecommendationViewModel
 ) {
+    val configuration = LocalConfiguration.current
+    val size = when (configuration.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> configuration.screenHeightDp.dp
+        else -> configuration.screenWidthDp.dp
+    }.toPx
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.init(size.toInt())
+    }
+
     val items by remember {
         viewModel.recommendations
     }.collectAsState(emptyList())
@@ -62,7 +74,7 @@ fun HomeScreen(
         if (items.isEmpty()) {
             items(count = 10) {
                 Song(
-                    songItem = ItemData.SongItem(),
+                    songItem = MediaItem.EMPTY,
                     onClick = {},
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.surface),
@@ -72,16 +84,16 @@ fun HomeScreen(
         } else {
             items(
                 items = items,
-                key = { item -> item.key }
+                key = { item -> item.mediaId }
             ) { item ->
                 Song(
                     songItem = item,
                     onClick = {
-                        viewModel.play(item.key)
+                        viewModel.play(item.mediaId)
                     },
                     modifier = Modifier
                         .background(
-                            if (currentPlayingMedia?.mediaId == item.key) {
+                            if (currentPlayingMedia?.mediaId == item.mediaId) {
                                 MaterialTheme.colorScheme.surfaceVariant
                             } else {
                                 MaterialTheme.colorScheme.surface
@@ -96,7 +108,7 @@ fun HomeScreen(
 @Composable
 fun Song(
     modifier: Modifier = Modifier,
-    songItem: ItemData.SongItem,
+    songItem: MediaItem,
     onClick: () -> Unit,
     isPlaceHolder: Boolean = false
 ) {
@@ -120,7 +132,7 @@ fun Song(
             modifier = Modifier
                 .setDynamicPlaceHolder(isVisible = isPlaceHolder)
                 .size(50.dp),
-            model = songItem.thumbnail.size(50.dp.toPx.roundToInt()),
+            model = songItem.mediaMetadata.artworkUri,
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
@@ -140,10 +152,7 @@ fun Song(
                     modifier = Modifier
                         .fillMaxWidth()
                         .setDynamicPlaceHolder(isVisible = isPlaceHolder),
-                    text = songItem.authors
-                        .joinToString {
-                            it.name.plus(" ")
-                        },
+                    text = songItem.mediaMetadata.artist?.toString().orEmpty(),
                     style = MaterialTheme.typography.titleMedium,
                     color = animatedOnBackground().value,
                     overflow = TextOverflow.Ellipsis
@@ -153,7 +162,7 @@ fun Song(
                     modifier = Modifier
                         .fillMaxWidth()
                         .setDynamicPlaceHolder(isVisible = isPlaceHolder),
-                    text = songItem.info.name,
+                    text = songItem.mediaMetadata.title?.toString().orEmpty(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = animatedOnBackground().value,
                     overflow = TextOverflow.Ellipsis

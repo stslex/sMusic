@@ -29,6 +29,10 @@ class MediaServiceControllerImpl(
     override val currentPlayingMedia: StateFlow<MediaItem?>
         get() = _currentPlayingMedia.asStateFlow()
 
+    private val _allMediaItems = MutableStateFlow<List<MediaItem>>(emptyList())
+    override val allMediaItems: StateFlow<List<MediaItem>>
+        get() = _allMediaItems.asStateFlow()
+
     private val mediaCache = mutableMapOf<String, Int>()
 
     private var job: Job
@@ -41,10 +45,18 @@ class MediaServiceControllerImpl(
     override fun addMediaItem(index: Int, mediaItem: MediaItem) {
         mediaCache[mediaItem.mediaId] = index
         player.addMediaItem(index, mediaItem)
+        _allMediaItems.update { allItems ->
+            allItems
+                .toMutableList()
+                .apply {
+                    add(mediaItem)
+                }
+        }
     }
 
     override fun addMediaItems(items: List<MediaItem>) {
         items.forEachIndexed(::addMediaItem)
+        player.prepare()
     }
 
     override suspend fun onPlayerEvent(playerEvent: PlayerEvent) {
@@ -77,13 +89,23 @@ class MediaServiceControllerImpl(
             }
 
             is PlayerEvent.Stop -> stopProgressUpdate()
-            is PlayerEvent.UpdateProgress -> player.seekTo((player.duration * playerEvent.newProgress).toLong())
+
+            is PlayerEvent.UpdateProgress -> {
+                val newProgress = player.duration * playerEvent.newProgress
+                player.seekTo(newProgress.toLong())
+            }
 
             is PlayerEvent.PlayPauseCurrent -> {
                 mediaCache[playerEvent.id]?.let { index ->
                     player.seekTo(index, 0)
-                    player.prepare()
                     player.play()
+                }
+            }
+
+            is PlayerEvent.SeekTo -> {
+                if (player.currentMediaItem?.mediaId == playerEvent.id) return
+                mediaCache[playerEvent.id]?.let { index ->
+                    player.seekTo(index, 0)
                 }
             }
         }

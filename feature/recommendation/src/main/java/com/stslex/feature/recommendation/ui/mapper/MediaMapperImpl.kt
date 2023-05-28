@@ -13,12 +13,13 @@ class MediaMapperImpl : MediaMapper {
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun map(
         item: ItemData.SongItem,
-        playerData: PlayerDataModel
+        playerData: PlayerDataModel,
+        size: Int
     ): MediaItem = MediaItem.Builder()
         .setMediaId(item.key)
         .setUri(playerData.uri)
         .setCustomCacheKey(item.key)
-        .setMediaMetadata(item.asMediaMetadata)
+        .setMediaMetadata(item.asMediaMetadata(size))
         .build()
 
     private val PlayerDataModel.uri: Uri
@@ -28,21 +29,23 @@ class MediaMapperImpl : MediaMapper {
             .orEmpty()
             .toUri()
 
-    private val ItemData.SongItem.asMediaMetadata: MediaMetadata
-        get() = MediaMetadata.Builder()
-            .setTitle(info.name)
-            .setArtist(authors.joinToString("") { it.name })
-            .setAlbumTitle(album.name)
-            .setArtworkUri(
-                thumbnail.size(300).toUri()
-            )
-            .setExtras(
-                bundleOf(
-                    "albumId" to album.browseId,
-                    "durationText" to durationText,
-                    "artistNames" to authors.map { it.name },
-                    "artistIds" to authors.map { it.browseId },
+    private val ItemData.SongItem.asMediaMetadata: (size: Int) -> MediaMetadata
+        get() = { size ->
+            MediaMetadata.Builder()
+                .setTitle(info.name)
+                .setArtist(authors.joinToString("") { it.name })
+                .setAlbumTitle(album.name)
+                .setArtworkUri(
+                    thumbnail.size(size).toUri()
                 )
-            )
-            .build()
+                .setExtras(
+                    bundleOf(
+                        "albumId" to album.browseId,
+                        "durationText" to durationText,
+                        "artistNames" to authors.map { it.name },
+                        "artistIds" to authors.map { it.browseId },
+                    )
+                )
+                .build()
+        }
 }

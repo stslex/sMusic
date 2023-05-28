@@ -3,20 +3,17 @@ package com.stslex.feature.recommendation.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
-import com.stslex.core.network.data.model.page.ItemData
 import com.stslex.core.player.controller.MediaServiceController
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.feature.recommendation.domain.interactor.RecommendationInteractor
 import com.stslex.feature.recommendation.domain.interactor.asFlowList
 import com.stslex.feature.recommendation.ui.mapper.MediaMapper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class RecommendationViewModel(
@@ -25,7 +22,7 @@ class RecommendationViewModel(
     private val mapper: MediaMapper
 ) : ViewModel() {
 
-    init {
+    fun init(size: Int) {
         interactor.recommendations
             .flowOn(Dispatchers.IO)
             .onEach { recommendations ->
@@ -35,7 +32,11 @@ class RecommendationViewModel(
                         interactor
                             .getPlayerData(songItem.key)
                             .map { playerData ->
-                                mapper.map(songItem, playerData)
+                                mapper.map(
+                                    item = songItem,
+                                    playerData = playerData,
+                                    size = size
+                                )
                             }
                     }
                     .asFlowList()
@@ -46,16 +47,8 @@ class RecommendationViewModel(
             .launchIn(viewModelScope)
     }
 
-    val recommendations: StateFlow<List<ItemData.SongItem>>
-        get() = interactor.recommendations
-            .map { recommendations ->
-                recommendations?.songs.orEmpty()
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Lazily,
-                initialValue = emptyList()
-            )
+    val recommendations: StateFlow<List<MediaItem>>
+        get() = mediaController.allMediaItems
 
     val currentPlayingMedia: StateFlow<MediaItem?>
         get() = mediaController.currentPlayingMedia
