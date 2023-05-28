@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -17,6 +18,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -130,24 +133,47 @@ fun SongCover(
 private fun Modifier.animatePager(
     pagerState: PagerState,
     page: Int
-): Modifier = graphicsLayer {
-    val pageOffset = (
-            (pagerState.currentPage - page) + pagerState
-                .currentPageOffsetFraction
-            )
-        .absoluteValue
+): Modifier {
+
+    val pageOffset = with(pagerState) {
+        currentPage - page + currentPageOffsetFraction
+    }
+
+    val pageOffsetAbsolute = pageOffset.absoluteValue
 
     val scale = lerp(
         0.75f,
         1f,
-        1f - pageOffset.coerceIn(0f, 1f)
+        1f - pageOffsetAbsolute.coerceIn(0f, 1f)
     )
-    scaleX = scale
-    scaleY = scale
 
-    alpha = lerp(
-        0.001f,
+    val calculatedAlpha = lerp(
+        0.5f,
         1f,
-        1f - pageOffset.coerceIn(0f, 1f)
+        1f - pageOffsetAbsolute.coerceIn(0f, 1f)
     )
+
+    val blur = lerp(
+        start = 1f,
+        stop = 0f,
+        fraction = 1f - pageOffsetAbsolute.coerceIn(0f, 1f)
+    )
+
+    val rotation = lerp(
+        start = 1f,
+        stop = -1f,
+        fraction = pageOffset.coerceIn(-1f, 1f)
+    )
+
+    return this
+        .graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+            alpha = calculatedAlpha
+            rotationY = (180 - 20) + rotation * 20
+        }
+        .clip(
+            RoundedCornerShape(32.dp * calculatedAlpha)
+        )
+        .blur(32.dp * blur)
 }
