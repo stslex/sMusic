@@ -23,6 +23,7 @@ class RecommendationViewModel(
 ) : ViewModel() {
 
     fun init(size: Int) {
+
         interactor.recommendations
             .flowOn(Dispatchers.IO)
             .onEach { recommendations ->
@@ -41,7 +42,9 @@ class RecommendationViewModel(
                     }
                     .asFlowList()
                     .flowOn(Dispatchers.IO)
-                    .onEach(mediaController::addMediaItems)
+                    .onEach { items ->
+                        mediaController.addMediaItems(items)
+                    }
                     .launchIn(viewModelScope)
             }
             .launchIn(viewModelScope)

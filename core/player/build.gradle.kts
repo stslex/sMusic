@@ -37,6 +37,8 @@ dependencies {
     implementation(project(":core:network"))
     implementation(libs.bundles.koin)
     api(libs.bundles.media3)
+    implementation(libs.androidx.media3.exoplayer.hls)
+    implementation(libs.androidx.work.runtime.ktx)
 
     implementation(libs.compose.coil)
     implementation(libs.core.ktx)

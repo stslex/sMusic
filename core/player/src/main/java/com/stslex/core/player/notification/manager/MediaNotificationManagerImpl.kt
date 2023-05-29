@@ -8,16 +8,16 @@ import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.ui.PlayerNotificationManager
+import com.stslex.core.player.player.AppPlayer
 import com.stslex.core.player.R
 import com.stslex.core.player.notification.adapter.MediaNotificationAdapterFactory
 
 class MediaNotificationManagerImpl(
     private val context: Context,
-    private val player: ExoPlayer,
+    private val player: AppPlayer,
     private val notificationFactory: MediaNotificationAdapterFactory
 ) : MediaNotificationManager {
 
@@ -50,7 +50,7 @@ class MediaNotificationManagerImpl(
                 setUseNextActionInCompactView(true)
                 setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 setUseChronometer(true)
-                setPlayer(player)
+                setPlayer(player.player)
             }
     }
 

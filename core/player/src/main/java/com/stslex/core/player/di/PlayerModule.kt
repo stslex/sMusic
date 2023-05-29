@@ -1,9 +1,5 @@
 package com.stslex.core.player.di
 
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.C
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.session.MediaSession
 import com.stslex.core.player.controller.MediaServiceController
 import com.stslex.core.player.controller.MediaServiceControllerImpl
 import com.stslex.core.player.image_loader.AppImageLoader
@@ -13,6 +9,10 @@ import com.stslex.core.player.notification.adapter.MediaNotificationAdapterFacto
 import com.stslex.core.player.notification.manager.MediaNotificationManager
 import com.stslex.core.player.notification.manager.MediaNotificationManager.Companion.PENDING_QUALIFIER
 import com.stslex.core.player.notification.manager.MediaNotificationManagerImpl
+import com.stslex.core.player.player.AppPlayer
+import com.stslex.core.player.player.AppPlayerImpl
+import com.stslex.core.player.session.AppMediaSession
+import com.stslex.core.player.session.AppMediaSessionImpl
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -21,29 +21,22 @@ import org.koin.dsl.module
 
 val corePlayerModule = module {
 
-    single<ExoPlayer> {
-        ExoPlayer.Builder(androidApplication())
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(C.USAGE_MEDIA)
-                    .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-                    .build(),
-                true
-            )
-            .build()
+    single<AppPlayer> {
+        AppPlayerImpl(androidApplication())
     }
 
-    single<MediaSession> {
-        MediaSession
-            .Builder(androidApplication(), get<ExoPlayer>())
-            .setSessionActivity(get(named(PENDING_QUALIFIER)))
-            .build()
+    single<AppMediaSession> {
+        AppMediaSessionImpl(
+            context = androidApplication(),
+            player = get<AppPlayer>(),
+            intent = get(named(PENDING_QUALIFIER))
+        )
     }
 
     single<MediaNotificationManager> {
         MediaNotificationManagerImpl(
             context = androidApplication(),
-            player = get<ExoPlayer>(),
+            player = get<AppPlayer>(),
             notificationFactory = get<MediaNotificationAdapterFactory>()
         )
     }
@@ -52,7 +45,12 @@ val corePlayerModule = module {
         bind<MediaNotificationAdapterFactory>()
     }
 
-    singleOf(::MediaServiceControllerImpl) { bind<MediaServiceController>() }
+    single<MediaServiceController> {
+        MediaServiceControllerImpl(
+            player = get<AppPlayer>(),
+            context = androidApplication()
+        )
+    }
 
     single<AppImageLoader> {
         AppImageLoaderImpl(androidApplication())
