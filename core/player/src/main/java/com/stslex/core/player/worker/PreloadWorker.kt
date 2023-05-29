@@ -4,9 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.media3.datasource.DataSpec
-import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.HttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.CacheWriter
 import androidx.media3.datasource.cache.SimpleCache
@@ -46,27 +44,23 @@ class PreloadWorker(
     }
 
     private var cachingJob: Job? = null
-    private lateinit var httpDataSourceFactory: HttpDataSource.Factory
-    private lateinit var defaultDataSourceFactory: DefaultDataSource.Factory
-    private lateinit var cacheDataSource: CacheDataSource
-    private val cache: SimpleCache = AppPlayerImpl.cache
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun doWork(): Result {
         try {
-            val videoUrl: String? = inputData.getString(AUDIO_URL)
+            val cache: SimpleCache = AppPlayerImpl.cache ?: return Result.failure()
 
-            httpDataSourceFactory = DefaultHttpDataSource.Factory()
+            val videoUrl: String? = inputData.getString(AUDIO_URL)
+            val httpDataSourceFactory = DefaultHttpDataSource.Factory()
                 .setAllowCrossProtocolRedirects(true)
 
-            defaultDataSourceFactory = DefaultDataSource.Factory(context, httpDataSourceFactory)
 
-            cacheDataSource = CacheDataSource.Factory()
+            val cacheDataSource = CacheDataSource.Factory()
                 .setCache(cache)
                 .setUpstreamDataSourceFactory(httpDataSourceFactory)
                 .createDataSource()
 
-            preCacheAudio(videoUrl)
+            preCacheAudio(videoUrl, cacheDataSource)
 
             return Result.success()
 
@@ -78,7 +72,8 @@ class PreloadWorker(
     @OptIn(DelicateCoroutinesApi::class)
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun preCacheAudio(
-        audioUrl: String?
+        audioUrl: String?,
+        cacheDataSource: CacheDataSource
     ) {
         val dataSpec = DataSpec(Uri.parse(audioUrl))
 
@@ -89,13 +84,14 @@ class PreloadWorker(
         }
 
         cachingJob = GlobalScope.launch(Dispatchers.IO) {
-            cache(dataSpec, progressListener)
+            cache(dataSpec, cacheDataSource, progressListener)
         }
     }
 
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun cache(
         dataSpec: DataSpec,
+        cacheDataSource: CacheDataSource,
         progressListener: CacheWriter.ProgressListener
     ) {
         runCatching {

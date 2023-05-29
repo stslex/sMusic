@@ -70,7 +70,7 @@ class MediaServiceControllerImpl(
     }
 
     private fun addToWorker(mediaItem: MediaItem) {
-        val url = mediaItem.requestMetadata.mediaUri?.toString().orEmpty()
+        val url = mediaItem.localConfiguration?.uri?.toString().orEmpty()
         val workerRequest = PreloadWorker.buildWorkRequest(url)
         val workName = PreloadWorker.AUDIO_URL.plus(url)
         workManager.enqueueUniqueWork(workName, ExistingWorkPolicy.KEEP, workerRequest)

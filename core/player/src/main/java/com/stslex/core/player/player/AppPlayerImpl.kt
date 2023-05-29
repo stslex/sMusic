@@ -27,9 +27,8 @@ class AppPlayerImpl(
         private const val DOWNLOAD_CONTENT_DIRECTORY = "downloads"
         private const val cacheSize: Long = 100 * 1024 * 1024
 
-        private var _cache: SimpleCache? = null
-        val cache: SimpleCache
-            get() = requireNotNull(_cache)
+        var cache: SimpleCache? = null
+            private set
     }
 
     override val player: ExoPlayer
@@ -47,21 +46,10 @@ class AppPlayerImpl(
     override val isPlaying: Boolean
         get() = player.isPlaying
 
-    init {
-        if (_cache == null) {
-            val cacheEvictor = LeastRecentlyUsedCacheEvictor(cacheSize)
-            val downloadContentDirectory = File(
-                context.getExternalFilesDir(null),
-                DOWNLOAD_CONTENT_DIRECTORY
-            )
-            val exoplayerDatabaseProvider = StandaloneDatabaseProvider(context)
-            _cache = SimpleCache(
-                downloadContentDirectory,
-                cacheEvictor,
-                exoplayerDatabaseProvider
-            )
-        }
+    private val simpleCache: SimpleCache
 
+    init {
+        simpleCache = initCache()
         cacheDataSourceFactory = getCacheDataSourceFactory()
         val mediaSourceFactory = DefaultMediaSourceFactory(cacheDataSourceFactory)
             .setLoadErrorHandlingPolicy(PlayerHandler)
@@ -69,8 +57,25 @@ class AppPlayerImpl(
         player = getPlayer(mediaSourceFactory)
     }
 
+    private fun initCache(): SimpleCache = if (cache == null) {
+        val cacheEvictor = LeastRecentlyUsedCacheEvictor(cacheSize)
+        val downloadContentDirectory = File(
+            context.getExternalFilesDir(null),
+            DOWNLOAD_CONTENT_DIRECTORY
+        )
+        val exoplayerDatabaseProvider = StandaloneDatabaseProvider(context)
+        cache = SimpleCache(
+            downloadContentDirectory,
+            cacheEvictor,
+            exoplayerDatabaseProvider
+        )
+        requireNotNull(cache)
+    } else {
+        requireNotNull(cache)
+    }
+
     private fun getCacheDataSourceFactory(): CacheDataSource.Factory {
-        val cacheSink = CacheDataSink.Factory().setCache(cache)
+        val cacheSink = CacheDataSink.Factory().setCache(simpleCache)
         val downStreamFactory = FileDataSource.Factory()
         val httpDataSourceFactory = DefaultHttpDataSource.Factory()
             .setAllowCrossProtocolRedirects(true)
@@ -78,7 +83,7 @@ class AppPlayerImpl(
         val upstreamFactory = DefaultDataSource.Factory(context, httpDataSourceFactory)
 
         return CacheDataSource.Factory()
-            .setCache(cache)
+            .setCache(simpleCache)
             .setUpstreamDataSourceFactory(upstreamFactory)
             .setCacheWriteDataSinkFactory(cacheSink)
             .setCacheReadDataSourceFactory(downStreamFactory)
