@@ -1,11 +1,17 @@
 package com.stslex.core.player.controller
 
+import android.content.Context
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkManager
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerState
 import com.stslex.core.player.model.SimpleMediaState
+import com.stslex.core.player.player.AppPlayer
+import com.stslex.core.player.player.SeekType
+import com.stslex.core.player.worker.PreloadWorker
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -18,8 +24,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MediaServiceControllerImpl(
-    private val player: ExoPlayer,
-) : MediaServiceController {
+    private val player: AppPlayer,
+    private val context: Context
+) : MediaServiceController, Player.Listener {
 
     private val _simpleMediaState = MutableStateFlow(SimpleMediaState())
     override val simpleMediaState: StateFlow<SimpleMediaState>
@@ -34,12 +41,12 @@ class MediaServiceControllerImpl(
         get() = _allMediaItems.asStateFlow()
 
     private val mediaCache = mutableMapOf<String, Int>()
-
-    private var job: Job
+    private var job: Job = Job()
+    private val workManager: WorkManager
 
     init {
         player.addListener(this)
-        job = Job()
+        workManager = WorkManager.getInstance(context)
     }
 
     override fun addMediaItem(index: Int, mediaItem: MediaItem) {
@@ -55,16 +62,26 @@ class MediaServiceControllerImpl(
     }
 
     override fun addMediaItems(items: List<MediaItem>) {
-        items.forEachIndexed(::addMediaItem)
+        items.forEachIndexed { index: Int, mediaItem: MediaItem ->
+            addToWorker(mediaItem)
+            addMediaItem(index, mediaItem)
+        }
         player.prepare()
+    }
+
+    private fun addToWorker(mediaItem: MediaItem) {
+        val url = mediaItem.localConfiguration?.uri?.toString().orEmpty()
+        val workerRequest = PreloadWorker.buildWorkRequest(url)
+        val workName = PreloadWorker.AUDIO_URL.plus(url)
+        workManager.enqueueUniqueWork(workName, ExistingWorkPolicy.KEEP, workerRequest)
     }
 
     override suspend fun onPlayerEvent(playerEvent: PlayerEvent) {
         when (playerEvent) {
-            is PlayerEvent.Backward -> player.seekBack()
-            is PlayerEvent.Forward -> player.seekForward()
-            is PlayerEvent.Next -> player.seekToNext()
-            is PlayerEvent.Previous -> player.seekToPrevious()
+            is PlayerEvent.Backward -> player.seek(SeekType.BACK)
+            is PlayerEvent.Forward -> player.seek(SeekType.FORWARD)
+            is PlayerEvent.Next -> player.seek(SeekType.NEXT)
+            is PlayerEvent.Previous -> player.seek(SeekType.PREVIOUS)
             is PlayerEvent.PlayPause -> {
                 if (player.isPlaying) {
                     player.pause()
@@ -85,7 +102,7 @@ class MediaServiceControllerImpl(
                         player.prepare()
                     }
                 }
-                player.playWhenReady = player.playWhenReady.not()
+                player.playWhenReadyOrNot()
             }
 
             is PlayerEvent.Stop -> stopProgressUpdate()
@@ -111,52 +128,6 @@ class MediaServiceControllerImpl(
         }
     }
 
-    override fun onPlaybackStateChanged(playbackState: Int) {
-        when (playbackState) {
-            ExoPlayer.STATE_BUFFERING -> _simpleMediaState.update { currentState ->
-                currentState.copy(
-                    playerState = PlayerState.Buffering(player.currentPosition)
-                )
-            }
-
-            ExoPlayer.STATE_READY -> _simpleMediaState.update { currentState ->
-                currentState.copy(
-                    duration = player.duration,
-                    playerState = PlayerState.Content
-                )
-            }
-
-            Player.STATE_ENDED -> {
-                // TODO()
-            }
-
-            Player.STATE_IDLE -> {
-                // TODO()
-            }
-        }
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    override fun onIsPlayingChanged(isPlaying: Boolean) {
-        _simpleMediaState.update { currentState ->
-            currentState.copy(
-                isPlaying = isPlaying
-            )
-        }
-        GlobalScope.launch(Dispatchers.Main) {
-            if (isPlaying) {
-                startProgressUpdate()
-            } else {
-                stopProgressUpdate()
-            }
-        }
-    }
-
-    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-        super.onMediaItemTransition(mediaItem, reason)
-        _currentPlayingMedia.tryEmit(player.currentMediaItem)
-    }
-
     private suspend fun startProgressUpdate() = job.run {
         while (true) {
             delay(10)
@@ -174,6 +145,47 @@ class MediaServiceControllerImpl(
             currentState.copy(
                 isPlaying = false
             )
+        }
+    }
+
+    override fun onPlaybackStateChanged(playbackState: Int) {
+        when (playbackState) {
+            ExoPlayer.STATE_BUFFERING -> _simpleMediaState.update { currentState ->
+                currentState.copy(
+                    playerState = PlayerState.Buffering(player.currentPosition)
+                )
+            }
+
+            ExoPlayer.STATE_READY -> _simpleMediaState.update { currentState ->
+                currentState.copy(
+                    duration = player.duration,
+                    playerState = PlayerState.Content
+                )
+            }
+
+            Player.STATE_ENDED -> Unit
+            Player.STATE_IDLE -> Unit
+        }
+    }
+
+    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+        super.onMediaItemTransition(mediaItem, reason)
+        _currentPlayingMedia.tryEmit(player.currentMediaItem)
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        _simpleMediaState.update { currentState ->
+            currentState.copy(
+                isPlaying = isPlaying
+            )
+        }
+        GlobalScope.launch(Dispatchers.Main) {
+            if (isPlaying) {
+                startProgressUpdate()
+            } else {
+                stopProgressUpdate()
+            }
         }
     }
 }
