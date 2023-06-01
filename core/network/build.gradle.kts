@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.stslex.core.innertube"
+    namespace = "com.stslex.core.network"
     compileSdk = 33
 
     defaultConfig {

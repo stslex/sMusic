@@ -1,18 +1,19 @@
 [versions]
 activityKtx = "1.7.2"
-com-android-library = "8.0.2"
-com-android-application = "8.0.2"
-org-jetbrains-kotlin-android = "1.8.10"
+gradle = "8.0.2"
+kotlin = "1.8.10"
 core-ktx = "1.10.1"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 appcompat = "1.6.1"
 material = "1.9.0"
+androidDesugarJdkLibs = "1.2.2"
 
 composeBom = "2023.05.01"
 activityCompose = "1.7.2"
 viewmodelCompose = "2.6.1"
+androidxComposeCompiler = "1.4.2"
 
 accompanist = "0.30.0"
 
@@ -32,6 +33,7 @@ workRuntimeKtx = "2.8.1"
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
@@ -83,11 +85,14 @@ media = { group = "androidx.media", name = "media", version.ref = "media" }
 androidx-media3-exoplayer-hls = { group = "androidx.media3", name = "media3-exoplayer-hls", version.ref = "media3ExoplayerHls" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 
+android-gradle = { group = "com.android.tools.build", name = "gradle", version.ref = "gradle" }
+kotlin-gradle = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+
 [plugins]
 
-com-android-application = { id = "com.android.application", version.ref = "com-android-application" }
-org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
-com-android-library = { id = "com.android.library", version.ref = "com-android-library" }
+com-android-application = { id = "com.android.application", version.ref = "gradle" }
+org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+com-android-library = { id = "com.android.library", version.ref = "gradle" }
 
 [bundles]
 
