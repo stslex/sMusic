@@ -1,4 +1,4 @@
-package com.stslex.smusic.screen.player
+package com.stslex.smusic.ui.v1.player
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton

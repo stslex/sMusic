@@ -10,4 +10,5 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:navigation"))
     implementation(project(":core:player"))
+    implementation("androidx.palette:palette:1.0.0")
 }

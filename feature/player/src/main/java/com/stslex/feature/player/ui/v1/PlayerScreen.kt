@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui
+package com.stslex.feature.player.ui.v1
 
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
@@ -27,10 +27,10 @@ import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.theme.AppTheme
-import com.stslex.feature.player.ui.components.PlayerControllerContainer
-import com.stslex.feature.player.ui.components.SongCover
-import com.stslex.feature.player.ui.components.SongInfoHeader
-import com.stslex.feature.player.ui.components.SongProgressBar
+import com.stslex.feature.player.ui.v1.components.PlayerControllerContainer
+import com.stslex.feature.player.ui.v1.components.SongCover
+import com.stslex.feature.player.ui.v1.components.SongInfoHeader
+import com.stslex.feature.player.ui.v1.components.SongProgressBar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

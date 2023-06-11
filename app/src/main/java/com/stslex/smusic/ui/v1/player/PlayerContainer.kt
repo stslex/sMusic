@@ -1,4 +1,4 @@
-package com.stslex.smusic.screen.player
+package com.stslex.smusic.ui.v1.player
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,8 +28,8 @@ import coil.compose.AsyncImage
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.components.setStaticPlaceHolder
-import com.stslex.smusic.screen.SwipeAction
-import com.stslex.smusic.screen.swipeAction
+import com.stslex.smusic.ui.SwipeAction
+import com.stslex.smusic.ui.swipeAction
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.reflect.KProperty0
 

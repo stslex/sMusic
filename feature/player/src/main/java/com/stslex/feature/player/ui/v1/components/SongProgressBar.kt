@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui.components
+package com.stslex.feature.player.ui.v1.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures

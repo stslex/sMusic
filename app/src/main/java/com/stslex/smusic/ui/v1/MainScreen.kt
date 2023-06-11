@@ -1,4 +1,4 @@
-package com.stslex.smusic.screen
+package com.stslex.smusic.ui.v1
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -26,10 +26,10 @@ import com.stslex.core.ui.extensions.animatedBackground
 import com.stslex.core.ui.extensions.toPx
 import com.stslex.smusic.navigation.NavigationHost
 import com.stslex.smusic.navigation.navigate
-import com.stslex.smusic.screen.appbar.AppTopAppBar
-import com.stslex.smusic.screen.bottom_appbar.AppBottomBar
-import com.stslex.smusic.screen.bottom_appbar.BottomAppbarItem
-import com.stslex.smusic.screen.player.PlayerContainer
+import com.stslex.smusic.ui.v1.appbar.AppTopAppBar
+import com.stslex.smusic.ui.v1.bottom_appbar.AppBottomBar
+import com.stslex.smusic.ui.v1.bottom_appbar.BottomAppbarItem
+import com.stslex.smusic.ui.v1.player.PlayerContainer
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.reflect.KProperty0
 

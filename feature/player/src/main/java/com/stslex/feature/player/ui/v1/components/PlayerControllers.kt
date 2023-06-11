@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui.components
+package com.stslex.feature.player.ui.v1.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateIntAsState

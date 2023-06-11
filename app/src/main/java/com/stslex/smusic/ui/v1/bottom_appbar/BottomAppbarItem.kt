@@ -1,4 +1,4 @@
-package com.stslex.smusic.screen.bottom_appbar
+package com.stslex.smusic.ui.v1.bottom_appbar
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
