@@ -6,5 +6,5 @@ plugins {
 android.namespace = "com.stslex.core.navigation"
 
 dependencies {
-    api(libs.accompanist.navigation)
+    api(libs.compose.navigation)
 }

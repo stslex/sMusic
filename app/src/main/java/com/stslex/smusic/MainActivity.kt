@@ -9,7 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.stslex.core.ui.extensions.animatedBackground
 import com.stslex.core.ui.theme.AppTheme
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val isSystemDark = isSystemInDarkTheme()
             val systemUiController = rememberSystemUiController()
-            val navHostController = rememberAnimatedNavController()
+            val navHostController = rememberNavController()
 
             val settingsValue by remember(viewModel) { viewModel.settings }.collectAsState()
 
