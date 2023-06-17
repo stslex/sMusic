@@ -2,6 +2,10 @@ package com.stslex.feature.player.ui.v1
 
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import android.graphics.Bitmap
+import android.net.Uri
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,16 +17,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.palette.graphics.Palette
+import coil.ImageLoader
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.SimpleMediaState
@@ -44,6 +59,8 @@ fun PlayerScreen(
     modifier: Modifier = Modifier,
 ) {
     val localConfiguration = LocalConfiguration.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val mediaItem by remember {
         currentMediaItem()
@@ -57,6 +74,57 @@ fun PlayerScreen(
         allMediaItems()
     }.collectAsState()
 
+    var mutedSwatch by remember {
+        mutableStateOf<Palette.Swatch?>(null)
+    }
+
+    val backgroundColor by animateColorAsState(
+        targetValue = mutedSwatch
+            ?.rgb
+            ?.let(::Color)
+            ?: MaterialTheme.colorScheme.background,
+        label = "background color",
+        animationSpec = tween(1000)
+    )
+
+    val textTitleColor by animateColorAsState(
+        targetValue = mutedSwatch?.titleTextColor?.let(::Color)
+            ?: MaterialTheme.colorScheme.onSurface,
+        label = "text title color",
+        animationSpec = tween(600)
+    )
+
+    val textBodyColor by animateColorAsState(
+        targetValue = mutedSwatch?.bodyTextColor?.let(::Color)
+            ?: MaterialTheme.colorScheme.onSurfaceVariant,
+        label = "text body color",
+        animationSpec = tween(600)
+    )
+
+    LaunchedEffect(mediaItem?.mediaMetadata?.artworkUri) {
+        val uri = mediaItem?.mediaMetadata?.artworkUri ?: Uri.EMPTY
+        val imageLoader = ImageLoader(context)
+        val imageRequest = ImageRequest.Builder(context)
+            .data(uri)
+            .placeholderMemoryCacheKey(uri.toString())
+            .memoryCacheKey(uri.toString())
+            .diskCacheKey(uri.toString())
+            .networkCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .allowHardware(false)
+            .bitmapConfig(Bitmap.Config.RGBA_F16)
+            .build()
+
+        imageLoader
+            .execute(imageRequest)
+            .drawable
+            ?.toBitmap()
+            ?.let { bitmap ->
+                mutedSwatch = Palette.Builder(bitmap).generate().mutedSwatch
+            }
+    }
+
     if (localConfiguration.orientation == ORIENTATION_LANDSCAPE) {
         PlayerScreenLandscape(
             mediaItem = mediaItem,
@@ -65,6 +133,7 @@ fun PlayerScreen(
             sendPlayerEvent = onPlayerClick,
             navigate = navigate,
             modifier = modifier
+                .background(backgroundColor)
         )
     } else {
         PlayerScreenPortrait(
@@ -74,6 +143,7 @@ fun PlayerScreen(
             sendPlayerEvent = onPlayerClick,
             navigate = navigate,
             modifier = modifier
+                .background(backgroundColor)
         )
     }
 }
@@ -89,7 +159,6 @@ fun PlayerScreenLandscape(
 ) {
     Row(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
     ) {
         SongCover(
@@ -144,7 +213,6 @@ fun PlayerScreenPortrait(
 ) {
     Box(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
     ) {
         LazyColumn(
