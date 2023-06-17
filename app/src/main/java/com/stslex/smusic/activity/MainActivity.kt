@@ -14,6 +14,7 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.stslex.core.ui.theme.AppTheme
+import com.stslex.smusic.ui.v1.MainScreen
 import com.stslex.smusic.ui.v2.MainScreenV2
 import org.koin.android.ext.android.inject
 
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        //WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             val isSystemDark = isSystemInDarkTheme()
@@ -55,15 +56,15 @@ class MainActivity : AppCompatActivity() {
                 isDarkTheme = isDarkTheme
             ) {
 
-                MainScreenV2(
-                    navController = navHostController
-                )
-//                MainScreen(
-//                    navHostController = navHostController,
-//                    currentMediaItem = viewModel::currentMediaItem,
-//                    onPlayerClick = viewModel::onPlayerClick,
-//                    simpleMediaState = viewModel::simpleMediaState,
+//                MainScreenV2(
+//                    navController = navHostController
 //                )
+                MainScreen(
+                    navHostController = navHostController,
+                    currentMediaItem = viewModel::currentMediaItem,
+                    onPlayerClick = viewModel::onPlayerClick,
+                    simpleMediaState = viewModel::simpleMediaState,
+                )
             }
         }
     }
