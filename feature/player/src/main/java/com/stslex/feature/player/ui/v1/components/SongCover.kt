@@ -1,6 +1,7 @@
-package com.stslex.feature.player.ui.components
+package com.stslex.feature.player.ui.v1.components
 
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,6 +31,8 @@ import androidx.media3.common.MediaItem
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import coil.request.SuccessResult
+import coil.size.Size
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.ui.extensions.toDp
 import kotlin.math.absoluteValue
@@ -40,7 +43,8 @@ fun SongCover(
     currentId: String,
     allMediaItems: List<MediaItem>,
     sendPlayerEvent: (PlayerEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSuccessResult: (SuccessResult) -> Unit = {},
 ) {
     val configuration = LocalConfiguration.current
     val initialPage = remember {
@@ -121,6 +125,14 @@ fun SongCover(
                     .diskCachePolicy(CachePolicy.ENABLED)
                     .memoryCachePolicy(CachePolicy.ENABLED)
                     .crossfade(true)
+                    .size(Size.ORIGINAL)
+                    .allowHardware(false)
+                    .bitmapConfig(Bitmap.Config.RGBA_F16)
+                    .listener(
+                        onSuccess = { _, result ->
+                            onSuccessResult(result)
+                        }
+                    )
                     .build(),
                 contentDescription = "song cover",
                 contentScale = ContentScale.Crop,

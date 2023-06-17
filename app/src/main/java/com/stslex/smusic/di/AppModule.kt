@@ -3,8 +3,8 @@ package com.stslex.smusic.di
 import android.app.PendingIntent
 import android.content.Intent
 import com.stslex.core.player.notification.manager.MediaNotificationManager.Companion.PENDING_QUALIFIER
-import com.stslex.smusic.MainActivity
-import com.stslex.smusic.MainActivityViewModel
+import com.stslex.smusic.activity.MainActivity
+import com.stslex.smusic.activity.MainActivityViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.qualifier.named

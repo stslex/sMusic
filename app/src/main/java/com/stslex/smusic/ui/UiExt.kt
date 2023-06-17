@@ -1,4 +1,4 @@
-package com.stslex.smusic.screen
+package com.stslex.smusic.ui
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween

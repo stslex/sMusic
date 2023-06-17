@@ -1,4 +1,4 @@
-package com.stslex.smusic.screen.player
+package com.stslex.smusic.ui.v1.player
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

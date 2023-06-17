@@ -1,4 +1,4 @@
-package com.stslex.smusic
+package com.stslex.smusic.activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

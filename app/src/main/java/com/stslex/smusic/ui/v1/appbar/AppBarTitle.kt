@@ -1,4 +1,4 @@
-package com.stslex.smusic.screen.appbar
+package com.stslex.smusic.ui.v1.appbar
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text

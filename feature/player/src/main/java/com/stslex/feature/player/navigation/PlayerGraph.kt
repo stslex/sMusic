@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.stslex.core.navigation.NavDestination
 import com.stslex.core.navigation.NavigationScreen
-import com.stslex.feature.player.ui.PlayerScreen
+import com.stslex.feature.player.ui.v1.PlayerScreen
 import com.stslex.feature.player.ui.PlayerViewModel
 import org.koin.androidx.compose.koinViewModel
 
