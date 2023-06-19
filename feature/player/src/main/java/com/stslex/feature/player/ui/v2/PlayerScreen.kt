@@ -2,8 +2,10 @@ package com.stslex.feature.player.ui.v2
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -104,7 +106,7 @@ fun PlayerScreen(
         mutableStateOf<Palette.Swatch?>(null)
     }
 
-    val scope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
     val backgroundColor by animateColorAsState(
         targetValue = mutedSwatch?.rgb?.let(::Color) ?: MaterialTheme.colorScheme.background,
@@ -129,6 +131,17 @@ fun PlayerScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .clickable(
+                enabled = swipeableState.currentValue == SwipeState.SHRINK
+            ) {
+                coroutineScope.launch {
+                    swipeableState.animateTo(
+                        targetValue = SwipeState.EXPAND,
+                        anim = spring(0.9f)
+                    )
+                }
+
+            }
     ) {
 
         Box(
@@ -170,12 +183,12 @@ fun PlayerScreen(
                     val statusBarPadding = WindowInsets.statusBars
                         .asPaddingValues()
                         .let {
-                            it.calculateTopPadding() + it.calculateBottomPadding()
+                            it.calculateTopPadding()
                         }
 
 
                     val paddingTop = remember(swipeableOffset, swipeProgress) {
-                        (swipeableOffsetDp - screenHeight + statusBarPadding)
+                        (swipeableOffsetDp - screenHeight + statusBarPadding - 32.dp * swipeProgress)
                             .coerceAtLeast(0.dp)
                     }
 
@@ -188,7 +201,7 @@ fun PlayerScreen(
                         allMediaItems = allItems,
                         sendPlayerEvent = onPlayerClick,
                         onCurrentItem = { result ->
-                            scope.launch(Dispatchers.Main) {
+                            coroutineScope.launch(Dispatchers.Main) {
                                 val palette = Palette.Builder(result.drawable.toBitmap()).generate()
                                 mutedSwatch = palette.mutedSwatch
                             }
