@@ -1,7 +1,6 @@
 package com.stslex.feature.player.ui.v1.components
 
 import android.content.res.Configuration
-import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,9 +30,9 @@ import androidx.media3.common.MediaItem
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import coil.request.SuccessResult
 import coil.size.Size
 import com.stslex.core.player.model.PlayerEvent
+import com.stslex.core.ui.extensions.statusBarPadding
 import com.stslex.core.ui.extensions.toDp
 import kotlin.math.absoluteValue
 
@@ -44,7 +43,6 @@ fun SongCover(
     allMediaItems: List<MediaItem>,
     sendPlayerEvent: (PlayerEvent) -> Unit,
     modifier: Modifier = Modifier,
-    onCurrentItem: (SuccessResult) -> Unit = {},
     swipeProgress: Float = 1f
 ) {
     val configuration = LocalConfiguration.current
@@ -83,7 +81,11 @@ fun SongCover(
             .takeIf { it > -1 }
             ?: 0
         if (pagerState.currentPage == page) return@LaunchedEffect
-        pagerState.animateScrollToPage(page)
+        if (swipeProgress == 1f) {
+            pagerState.animateScrollToPage(page)
+        } else {
+            pagerState.scrollToPage(page)
+        }
     }
 
     BoxWithConstraints(
@@ -106,7 +108,8 @@ fun SongCover(
                 .size(sizeDp),
             pageCount = allMediaItems.size,
             state = pagerState,
-            key = { page -> page }
+            key = { page -> page },
+            userScrollEnabled = swipeProgress == 1f
         ) { page ->
 
             val context = LocalContext.current
@@ -116,7 +119,8 @@ fun SongCover(
             AsyncImage(
                 modifier = Modifier
                     .size(sizeDp)
-                    .padding(32.dp * swipeProgress)
+                    .padding(horizontal = 32.dp * swipeProgress)
+                    .padding(top = statusBarPadding * swipeProgress)
                     .animatePager(pagerState, page, swipeProgress),
                 model = ImageRequest.Builder(context)
                     .data(uri)
@@ -128,15 +132,6 @@ fun SongCover(
                     .memoryCachePolicy(CachePolicy.ENABLED)
                     .crossfade(true)
                     .size(Size.ORIGINAL)
-                    .allowHardware(false)
-                    .bitmapConfig(Bitmap.Config.RGBA_F16)
-                    .listener(
-                        onSuccess = { _, result ->
-                            if (currentItem?.mediaId == currentId) {
-                                onCurrentItem(result)
-                            }
-                        }
-                    )
                     .build(),
                 contentDescription = "song cover",
                 contentScale = ContentScale.Crop,
