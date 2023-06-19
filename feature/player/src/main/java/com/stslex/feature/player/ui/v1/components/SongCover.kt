@@ -44,7 +44,8 @@ fun SongCover(
     allMediaItems: List<MediaItem>,
     sendPlayerEvent: (PlayerEvent) -> Unit,
     modifier: Modifier = Modifier,
-    onSuccessResult: (SuccessResult) -> Unit = {},
+    onCurrentItem: (SuccessResult) -> Unit = {},
+    swipeProgress: Float = 1f
 ) {
     val configuration = LocalConfiguration.current
     val initialPage = remember {
@@ -60,7 +61,7 @@ fun SongCover(
         initialPage = initialPage
     )
 
-    val selectedId by remember {
+    val selectedId by remember(pagerState.currentPage) {
         derivedStateOf {
             allMediaItems.getOrNull(pagerState.currentPage)?.mediaId.orEmpty()
         }
@@ -109,13 +110,14 @@ fun SongCover(
         ) { page ->
 
             val context = LocalContext.current
-            val uri = allMediaItems.getOrNull(page)?.mediaMetadata?.artworkUri
+            val currentItem = allMediaItems.getOrNull(page)
+            val uri = currentItem?.mediaMetadata?.artworkUri
 
             AsyncImage(
                 modifier = Modifier
                     .size(sizeDp)
-                    .padding(32.dp)
-                    .animatePager(pagerState, page),
+                    .padding(32.dp * swipeProgress)
+                    .animatePager(pagerState, page, swipeProgress),
                 model = ImageRequest.Builder(context)
                     .data(uri)
                     .placeholderMemoryCacheKey(uri.toString())
@@ -130,7 +132,9 @@ fun SongCover(
                     .bitmapConfig(Bitmap.Config.RGBA_F16)
                     .listener(
                         onSuccess = { _, result ->
-                            onSuccessResult(result)
+                            if (currentItem?.mediaId == currentId) {
+                                onCurrentItem(result)
+                            }
                         }
                     )
                     .build(),
@@ -144,7 +148,8 @@ fun SongCover(
 @OptIn(ExperimentalFoundationApi::class)
 private fun Modifier.animatePager(
     pagerState: PagerState,
-    page: Int
+    page: Int,
+    swipeProgress: Float,
 ): Modifier {
 
     val pageOffset = with(pagerState) {
@@ -185,7 +190,7 @@ private fun Modifier.animatePager(
             rotationY = (180 - 20) + rotation * 20
         }
         .clip(
-            RoundedCornerShape(32.dp * calculatedAlpha)
+            RoundedCornerShape(32.dp * calculatedAlpha * swipeProgress)
         )
         .blur(32.dp * blur)
 }

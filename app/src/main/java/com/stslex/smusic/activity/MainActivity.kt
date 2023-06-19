@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             val isSystemDark = isSystemInDarkTheme()
@@ -56,15 +56,15 @@ class MainActivity : AppCompatActivity() {
                 isDarkTheme = isDarkTheme
             ) {
 
-//                MainScreenV2(
-//                    navController = navHostController
-//                )
-                MainScreen(
-                    navHostController = navHostController,
-                    currentMediaItem = viewModel::currentMediaItem,
-                    onPlayerClick = viewModel::onPlayerClick,
-                    simpleMediaState = viewModel::simpleMediaState,
+                MainScreenV2(
+                    navController = navHostController
                 )
+//                MainScreen(
+//                    navHostController = navHostController,
+//                    currentMediaItem = viewModel::currentMediaItem,
+//                    onPlayerClick = viewModel::onPlayerClick,
+//                    simpleMediaState = viewModel::simpleMediaState,
+//                )
             }
         }
     }

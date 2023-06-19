@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +57,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -65,11 +70,22 @@ fun PlayerScreen(
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
+    val initialHeight = 100.dp
 
     val swipeableState = rememberSwipeableState(
         initialValue = SwipeState.SHRINK
     )
-    val initialHeight = 100.dp
+
+    val swipeableOffset by remember {
+        derivedStateOf {
+            abs(swipeableState.offset.value)
+        }
+    }
+    val swipeableOffsetDp = swipeableOffset.toDp
+
+    val swipeProgress = remember(swipeableOffset) {
+        swipeableOffsetDp / screenHeight
+    }
 
 
     val mediaState by remember {
@@ -111,7 +127,8 @@ fun PlayerScreen(
     )
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ) {
 
         Box(
@@ -124,7 +141,7 @@ fun PlayerScreen(
                     ),
                     orientation = Orientation.Vertical
                 )
-                .height(initialHeight - swipeableState.offset.value.toDp)
+                .height(swipeableOffset.toDp + initialHeight)
                 .background(backgroundColor)
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
@@ -143,26 +160,40 @@ fun PlayerScreen(
                 ) {
 
                     val screenWidth = configuration.screenWidthDp.dp
-                    val imageHeight = initialHeight - swipeableState.offset.value.toDp
-                    val imageSize = if (imageHeight < screenWidth) {
-                        imageHeight
+                    val swipeableOffsetHeight = swipeableOffsetDp + initialHeight
+                    val imageSize = if (swipeableOffsetHeight < screenWidth) {
+                        swipeableOffsetHeight
                     } else {
                         screenWidth
                     }
 
+                    val statusBarPadding = WindowInsets.statusBars
+                        .asPaddingValues()
+                        .let {
+                            it.calculateTopPadding() + it.calculateBottomPadding()
+                        }
+
+
+                    val paddingTop = remember(swipeableOffset, swipeProgress) {
+                        (swipeableOffsetDp - screenHeight + statusBarPadding)
+                            .coerceAtLeast(0.dp)
+                    }
+
                     SongCover(
                         modifier = Modifier
+                            .padding(top = paddingTop)
                             .size(imageSize)
                             .align(Alignment.Start),
                         currentId = mediaItem?.mediaId.orEmpty(),
                         allMediaItems = allItems,
                         sendPlayerEvent = onPlayerClick,
-                        onSuccessResult = { result ->
+                        onCurrentItem = { result ->
                             scope.launch(Dispatchers.Main) {
                                 val palette = Palette.Builder(result.drawable.toBitmap()).generate()
                                 mutedSwatch = palette.mutedSwatch
                             }
-                        }
+                        },
+                        swipeProgress = swipeProgress
                     )
 
                     AnimatedVisibility(
@@ -231,7 +262,7 @@ fun PlayerScreen(
                                 .fillMaxWidth(),
                             text = mediaItem?.mediaMetadata?.title?.toString().orEmpty(),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = textTitleColor,
+                            color = textBodyColor,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
