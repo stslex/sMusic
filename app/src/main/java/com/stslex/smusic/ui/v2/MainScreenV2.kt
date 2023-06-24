@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.ui.theme.AppTheme
 import com.stslex.feature.player.ui.v2.PlayerInit
+import com.stslex.feature.player.ui.v2.rememberSwipeableState
 import com.stslex.smusic.navigation.NavigationHost
 import com.stslex.smusic.navigation.navigate
 import com.stslex.smusic.ui.v1.appbar.AppTopAppBar
@@ -28,11 +29,11 @@ fun MainScreenV2(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
-
     val currentDestination = navController.currentBackStackEntryAsState()
     val currentRoute by remember {
         derivedStateOf { currentDestination.value?.destination?.route.orEmpty() }
     }
+    val swipeState = rememberSwipeableState()
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -60,7 +61,9 @@ fun MainScreenV2(
             )
         }
 
-        PlayerInit()
+        PlayerInit(
+            swipeableState = swipeState
+        )
     }
 }
 

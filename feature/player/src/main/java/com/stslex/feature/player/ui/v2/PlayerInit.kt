@@ -10,6 +10,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PlayerInit(
+    swipeableState: AppSwipeState,
     modifier: Modifier = Modifier,
     viewModel: PlayerViewModel = koinViewModel(),
 ) {
@@ -31,5 +32,6 @@ fun PlayerInit(
         allMediaItems = allMediaItems,
         onPlayerClick = viewModel::onPlayerClick,
         modifier = modifier,
+        swipeableState = swipeableState
     )
 }
