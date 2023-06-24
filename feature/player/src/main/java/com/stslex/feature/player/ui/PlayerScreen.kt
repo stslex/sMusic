@@ -80,7 +80,7 @@ fun PlayerScreen(
                 .background(
                     colorCalculator.backgroundColor.copy(
                         alpha = if (swipeableState.swipeProgress <= .2f) {
-                            0.5f
+                            0.95f
                         } else {
                             swipeableState.swipeProgress
                         }
