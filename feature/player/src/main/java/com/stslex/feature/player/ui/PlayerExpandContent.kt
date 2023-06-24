@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui.v2
+package com.stslex.feature.player.ui
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -9,9 +9,10 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.SimpleMediaState
-import com.stslex.feature.player.ui.v1.components.PlayerControllerContainer
-import com.stslex.feature.player.ui.v1.components.SongInfoHeader
-import com.stslex.feature.player.ui.v1.components.SongProgressBar
+import com.stslex.feature.player.ui.base.ColorCalculator
+import com.stslex.feature.player.ui.components.PlayerControllerContainer
+import com.stslex.feature.player.ui.components.SongInfoHeader
+import com.stslex.feature.player.ui.components.SongProgressBar
 
 @Composable
 fun PlayerExpandContent(
@@ -33,8 +34,7 @@ fun PlayerExpandContent(
                     .orEmpty(),
                 artist = currentMediaItem?.mediaMetadata?.artist?.toString()
                     .orEmpty(),
-                titleColor = colorCalculator.textTitleColor,
-                bodyColor = colorCalculator.textBodyColor
+                colorCalculator = colorCalculator
             )
         }
         item { Spacer(modifier = Modifier.padding(16.dp)) }
@@ -43,7 +43,8 @@ fun PlayerExpandContent(
                 modifier = Modifier
                     .padding(horizontal = 32.dp),
                 sendPlayerEvent = onPlayerClick,
-                playerPlayingState = simpleMediaState.playerPlayingState
+                playerPlayingState = simpleMediaState.playerPlayingState,
+                colorCalculator = colorCalculator
             )
         }
         item { Spacer(modifier = Modifier.padding(8.dp)) }
@@ -54,7 +55,8 @@ fun PlayerExpandContent(
                 mediaState = simpleMediaState,
                 updateProgress = { progress ->
                     onPlayerClick(PlayerEvent.UpdateProgress(progress))
-                }
+                },
+                colorCalculator = colorCalculator
             )
         }
     }

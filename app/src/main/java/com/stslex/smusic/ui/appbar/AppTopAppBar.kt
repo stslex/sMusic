@@ -1,4 +1,4 @@
-package com.stslex.smusic.ui.v1.appbar
+package com.stslex.smusic.ui.appbar
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBar

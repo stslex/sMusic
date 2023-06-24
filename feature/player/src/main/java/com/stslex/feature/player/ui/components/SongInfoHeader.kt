@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui.v1.components
+package com.stslex.feature.player.ui.components
 
 import android.os.Build
 import androidx.compose.foundation.layout.Column
@@ -9,19 +9,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.stslex.core.ui.components.shader.test.ShaderText
+import com.stslex.feature.player.ui.base.ColorCalculator
 
 @Composable
 fun SongInfoHeader(
     song: String,
     artist: String,
+    colorCalculator: ColorCalculator,
     modifier: Modifier = Modifier,
-    titleColor: Color = MaterialTheme.colorScheme.onSurface,
-    bodyColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     Column(
         modifier = modifier
@@ -34,7 +33,7 @@ fun SongInfoHeader(
                 style = MaterialTheme.typography.titleLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = titleColor,
+                color = colorCalculator.contentColor,
                 textAlign = TextAlign.Center,
             )
             ShaderText(
@@ -44,14 +43,14 @@ fun SongInfoHeader(
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = bodyColor,
+                color = colorCalculator.contentColor,
                 textAlign = TextAlign.Center
             )
         } else {
             Text(
                 text = song,
                 style = MaterialTheme.typography.titleLarge,
-                color = titleColor,
+                color = colorCalculator.contentColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center
@@ -64,7 +63,7 @@ fun SongInfoHeader(
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = bodyColor,
+                color = colorCalculator.contentColor,
                 textAlign = TextAlign.Center
             )
         }

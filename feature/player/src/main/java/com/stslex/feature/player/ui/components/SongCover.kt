@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui.v1.components
+package com.stslex.feature.player.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -182,7 +182,7 @@ private fun Modifier.animatePager(
             scaleX = scale
             scaleY = scale
             alpha = calculatedAlpha
-            rotationY = (180 - 20) + rotation * 20
+            rotationY = rotation * 20 - 20
         }
         .clip(
             RoundedCornerShape(32.dp * calculatedAlpha * swipeProgress)

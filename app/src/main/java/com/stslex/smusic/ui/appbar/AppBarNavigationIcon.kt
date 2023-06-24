@@ -1,4 +1,4 @@
-package com.stslex.smusic.ui.v1.appbar
+package com.stslex.smusic.ui.appbar
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween

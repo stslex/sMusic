@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui.v2
+package com.stslex.feature.player.ui.base
 
 enum class SwipeState {
     SHRINK,

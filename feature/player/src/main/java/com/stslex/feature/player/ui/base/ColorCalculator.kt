@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui.v2
+package com.stslex.feature.player.ui.base
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,7 +46,13 @@ class ColorCalculator(
             return color
         }
 
-    val textTitleColor: Color
+    val contentColor: Color
+        @Composable
+        get() = contentColorFor(
+            backgroundColor = backgroundColor
+        )
+
+    val textBodyColor: Color
         @Composable
         get() {
             val color by animateColorAsState(
@@ -63,7 +70,7 @@ class ColorCalculator(
             return color
         }
 
-    val textBodyColor: Color
+    val textTitleColor: Color
         @Composable
         get() {
             val color by animateColorAsState(

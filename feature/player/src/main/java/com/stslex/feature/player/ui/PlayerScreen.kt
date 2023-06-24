@@ -1,7 +1,6 @@
-package com.stslex.feature.player.ui.v2
+package com.stslex.feature.player.ui
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -30,8 +29,10 @@ import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.extensions.toDp
 import com.stslex.core.ui.theme.AppTheme
-import com.stslex.feature.player.ui.v1.components.SongCover
-import kotlinx.coroutines.launch
+import com.stslex.feature.player.ui.base.AppSwipeState
+import com.stslex.feature.player.ui.base.rememberColorCalculator
+import com.stslex.feature.player.ui.base.rememberSwipeableState
+import com.stslex.feature.player.ui.components.SongCover
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -76,12 +77,7 @@ fun PlayerScreen(
                 .clickable(
                     enabled = swipeableState.isShrink
                 ) {
-                    coroutineScope.launch {
-                        swipeableState.state.animateTo(
-                            targetValue = SwipeState.EXPAND,
-                            anim = spring(0.9f)
-                        )
-                    }
+                    swipeableState.expand()
                 }
                 .background(colorCalculator.backgroundColor)
                 .fillMaxWidth()

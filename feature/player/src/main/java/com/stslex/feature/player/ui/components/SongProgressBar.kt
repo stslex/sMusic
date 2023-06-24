@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui.v1.components
+package com.stslex.feature.player.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -20,11 +20,14 @@ import androidx.compose.ui.unit.dp
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.components.AnimateProgressbar
 import com.stslex.core.ui.theme.AppTheme
+import com.stslex.feature.player.ui.base.ColorCalculator
+import com.stslex.feature.player.ui.base.rememberColorCalculator
 
 @Composable
 fun SongProgressBar(
     mediaState: SimpleMediaState,
     updateProgress: (Float) -> Unit,
+    colorCalculator: ColorCalculator,
     modifier: Modifier = Modifier
 ) {
 
@@ -43,6 +46,8 @@ fun SongProgressBar(
                     }
                 },
                 progress = mediaState.progressPercentage,
+                colorLoader = colorCalculator.contentColor.copy(alpha = 0.8f),
+                colorProgress = colorCalculator.contentColor
             )
 
             Spacer(modifier = Modifier.padding(4.dp))
@@ -53,14 +58,14 @@ fun SongProgressBar(
                     modifier = Modifier.align(Alignment.BottomStart),
                     text = mediaState.currentProgress,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = colorCalculator.contentColor
                 )
 
                 Text(
                     modifier = Modifier.align(Alignment.BottomEnd),
                     text = mediaState.currentDuration,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = colorCalculator.contentColor
                 )
             }
         }
@@ -82,7 +87,8 @@ fun SongProgressBarPreview() {
         ) {
             SongProgressBar(
                 mediaState = SimpleMediaState(),
-                updateProgress = {}
+                updateProgress = {},
+                colorCalculator = rememberColorCalculator()
             )
         }
     }

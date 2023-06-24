@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui.v2
+package com.stslex.feature.player.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
+import com.stslex.feature.player.ui.base.ColorCalculator
 
 @Composable
 fun PlayerShrinkContent(
@@ -32,7 +33,8 @@ fun PlayerShrinkContent(
             text = currentMediaItem?.mediaMetadata?.artist?.toString().orEmpty(),
             style = MaterialTheme.typography.titleMedium,
             color = colorCalculator.textTitleColor,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Clip,
+            maxLines = 1
         )
         Spacer(modifier = Modifier.padding(4.dp))
         Text(
@@ -40,8 +42,9 @@ fun PlayerShrinkContent(
                 .fillMaxWidth(),
             text = currentMediaItem?.mediaMetadata?.title?.toString().orEmpty(),
             style = MaterialTheme.typography.bodyMedium,
-            color = colorCalculator.textBodyColor,
-            overflow = TextOverflow.Ellipsis
+            color = colorCalculator.contentColor,
+            overflow = TextOverflow.Clip,
+            maxLines = 1
         )
     }
 }
