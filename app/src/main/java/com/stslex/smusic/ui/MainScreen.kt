@@ -1,11 +1,10 @@
 package com.stslex.smusic.ui
 
-import androidx.compose.foundation.background
+import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -27,6 +26,7 @@ import com.stslex.smusic.navigation.NavigationHost
 import com.stslex.smusic.navigation.navigate
 import com.stslex.smusic.ui.appbar.AppTopAppBar
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
@@ -36,18 +36,23 @@ fun MainScreen(
     val currentRoute by remember {
         derivedStateOf { currentDestination.value?.destination?.route.orEmpty() }
     }
-    val swipeState = rememberSwipeableState()
+    val swipeableState = rememberSwipeableState()
+
+    BackHandler(
+        enabled = swipeableState.swipeProgress >= 0.1f
+    ) {
+        swipeableState.collapse()
+    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
     ) {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
-                .systemBarsPadding(),
-            topBar = {
+        ) { _ ->
+            Column {
                 AppTopAppBar(
                     currentRoute = currentRoute,
                     navToSettings = {
@@ -55,23 +60,20 @@ fun MainScreen(
                     },
                     popBackStack = navController::popBackStack
                 )
+                NavigationHost(
+                    modifier = Modifier
+                        .weight(1f)
+                        .blur(
+                            16.dp * swipeableState.swipeProgress
+                        )
+                        .scale(1 - (swipeableState.swipeProgress * .1f)),
+                    navController = navController
+                )
             }
-        ) { paddingValues ->
-            NavigationHost(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .blur(
-                        16.dp * swipeState.swipeProgress
-                    )
-                    .scale(1 - (swipeState.swipeProgress * .1f)),
-                navController = navController
-            )
         }
 
         PlayerInit(
-            swipeableState = swipeState
+            swipeableState = swipeableState
         )
     }
 }

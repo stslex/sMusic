@@ -18,7 +18,6 @@ import androidx.compose.material.swipeable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -45,7 +44,6 @@ fun PlayerScreen(
     modifier: Modifier = Modifier,
 ) {
     val configuration = LocalConfiguration.current
-    val coroutineScope = rememberCoroutineScope()
 
     val initialHeight = 100.dp
 
@@ -79,7 +77,15 @@ fun PlayerScreen(
                 ) {
                     swipeableState.expand()
                 }
-                .background(colorCalculator.backgroundColor)
+                .background(
+                    colorCalculator.backgroundColor.copy(
+                        alpha = if (swipeableState.swipeProgress <= .2f) {
+                            0.5f
+                        } else {
+                            swipeableState.swipeProgress
+                        }
+                    )
+                )
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
         ) {

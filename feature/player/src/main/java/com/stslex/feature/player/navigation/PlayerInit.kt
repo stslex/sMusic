@@ -1,6 +1,5 @@
 package com.stslex.feature.player.navigation
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,12 +27,6 @@ fun PlayerInit(
     val allMediaItems by remember {
         viewModel.allMediaItems
     }.collectAsState()
-
-    BackHandler(
-        enabled = swipeableState.swipeProgress != 0f
-    ) {
-        swipeableState.collapse()
-    }
 
     PlayerScreen(
         currentMediaItem = currentMediaItem,

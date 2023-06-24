@@ -38,7 +38,7 @@ fun SongProgressBar(
         Column {
             AnimateProgressbar(
                 modifier = Modifier.pointerInput(Unit) {
-                    detectHorizontalDragGestures { change, dragAmount ->
+                    detectHorizontalDragGestures { change, _ ->
                         val position = change.position.x
                         if (position == 0f) return@detectHorizontalDragGestures
                         val singleSize = position / maxWidth

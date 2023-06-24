@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.stslex.core.navigation.NavDestination
-import com.stslex.core.ui.extensions.animatedOnSurface
 
 @Composable
 fun AppBarTitle(
@@ -17,7 +16,7 @@ fun AppBarTitle(
     Text(
         modifier = modifier,
         text = stringResource(id = titleRes),
-        color = animatedOnSurface().value,
+        color = MaterialTheme.colorScheme.onSurface,
         style = MaterialTheme.typography.displaySmall
     )
 }

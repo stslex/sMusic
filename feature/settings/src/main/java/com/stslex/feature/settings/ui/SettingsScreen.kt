@@ -20,11 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.stslex.core.navigation.NavigationScreen
-import com.stslex.core.ui.extensions.animatedBackground
-import com.stslex.core.ui.extensions.animatedColor
-import com.stslex.core.ui.extensions.animatedOnBackground
 import com.stslex.core.datastore.SettingsDbModel
+import com.stslex.core.navigation.NavigationScreen
 
 @Composable
 fun SettingsScreen(
@@ -39,7 +36,7 @@ fun SettingsScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(color = animatedBackground().value)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
             modifier = Modifier
@@ -58,7 +55,7 @@ fun SettingsScreen(
             item {
                 Divider(
                     modifier = Modifier.padding(vertical = 16.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant.animatedColor().value
+                    color = MaterialTheme.colorScheme.outlineVariant
                 )
             }
         }
@@ -107,7 +104,7 @@ fun SettingsColumnTitle(
         modifier = modifier,
         text = text,
         style = MaterialTheme.typography.headlineMedium,
-        color = animatedOnBackground().value
+        color = MaterialTheme.colorScheme.onBackground
     )
 }
 
@@ -121,7 +118,7 @@ fun BoxScope.SettingsItemText(
             .align(Alignment.CenterStart),
         text = text,
         style = MaterialTheme.typography.headlineSmall,
-        color = animatedOnBackground().value
+        color = MaterialTheme.colorScheme.onBackground
     )
 }
 

@@ -1,12 +1,12 @@
 package com.stslex.smusic.ui.appbar
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.stslex.core.ui.extensions.animatedOnSurface
-import com.stslex.core.ui.extensions.animatedSurface
+import androidx.compose.ui.tooling.preview.Preview
+import com.stslex.core.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -17,7 +17,8 @@ fun AppTopAppBar(
     popBackStack: () -> Unit
 ) {
     TopAppBar(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth(),
         title = {
             AppBarTitle(currentRoute = currentRoute)
         },
@@ -33,12 +34,17 @@ fun AppTopAppBar(
                 popBackStack = popBackStack
             )
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = animatedSurface().value,
-            scrolledContainerColor = animatedSurface().value,
-            navigationIconContentColor = animatedOnSurface().value,
-            titleContentColor = animatedOnSurface().value,
-            actionIconContentColor = animatedOnSurface().value,
-        )
     )
+}
+
+@Composable
+@Preview
+fun AppTopAppBarPreview() {
+    AppTheme {
+        AppTopAppBar(
+            currentRoute = "",
+            navToSettings = {},
+            popBackStack = {}
+        )
+    }
 }
