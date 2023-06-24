@@ -1,4 +1,4 @@
-package com.stslex.smusic.ui.v1.appbar
+package com.stslex.smusic.ui.appbar
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -8,11 +8,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import com.stslex.core.navigation.NavDestination
-import com.stslex.core.ui.extensions.animatedOnSurface
 
 @Composable
 fun AppBarActions(
@@ -37,7 +37,7 @@ fun AppBarActions(
                 imageVector = Icons.Outlined.Settings,
                 contentDescription = "settings",
                 colorFilter = ColorFilter.tint(
-                    color = animatedOnSurface().value
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             )
         }

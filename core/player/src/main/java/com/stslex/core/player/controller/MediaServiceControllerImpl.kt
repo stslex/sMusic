@@ -62,10 +62,17 @@ class MediaServiceControllerImpl(
     }
 
     override fun addMediaItems(items: List<MediaItem>) {
-        items.forEachIndexed { index: Int, mediaItem: MediaItem ->
-            addToWorker(mediaItem)
-            addMediaItem(index, mediaItem)
-        }
+        items
+            .filter { item ->
+                mediaCache.containsKey(item.mediaId).not()
+            }
+            .ifEmpty {
+                return
+            }
+            .forEachIndexed { index: Int, mediaItem: MediaItem ->
+                addToWorker(mediaItem)
+                addMediaItem(index, mediaItem)
+            }
         player.prepare()
     }
 

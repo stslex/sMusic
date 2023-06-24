@@ -1,4 +1,4 @@
-package com.stslex.feature.player.ui.v1.components
+package com.stslex.feature.player.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateIntAsState
@@ -34,11 +34,14 @@ import androidx.compose.ui.unit.dp
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.PlayerPlayingState
 import com.stslex.core.ui.theme.AppTheme
+import com.stslex.feature.player.ui.base.ColorCalculator
+import com.stslex.feature.player.ui.base.rememberColorCalculator
 
 @Composable
 fun PlayerControllerContainer(
     sendPlayerEvent: (PlayerEvent) -> Unit,
     playerPlayingState: PlayerPlayingState,
+    colorCalculator: ColorCalculator,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -51,13 +54,15 @@ fun PlayerControllerContainer(
             Icon(
                 imageVector = Icons.Outlined.FavoriteBorder,
                 contentDescription = "like",
+                tint = colorCalculator.contentColor
             )
         }
 
         PlayerController(
             modifier = Modifier.weight(1f),
             onPlayerClick = sendPlayerEvent,
-            playerPlayingState = playerPlayingState
+            playerPlayingState = playerPlayingState,
+            colorCalculator = colorCalculator
         )
 
         IconButton(
@@ -66,6 +71,7 @@ fun PlayerControllerContainer(
             Icon(
                 imageVector = Icons.Outlined.Share,
                 contentDescription = "like",
+                tint = colorCalculator.contentColor
             )
         }
 
@@ -76,6 +82,7 @@ fun PlayerControllerContainer(
 fun PlayerController(
     onPlayerClick: (PlayerEvent) -> Unit,
     playerPlayingState: PlayerPlayingState,
+    colorCalculator: ColorCalculator,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -95,7 +102,7 @@ fun PlayerController(
                 Icon(
                     imageVector = Icons.Rounded.KeyboardArrowLeft,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = colorCalculator.contentColor
                 )
             }
 
@@ -105,7 +112,8 @@ fun PlayerController(
                 onClick = remember {
                     { onPlayerClick(PlayerEvent.ResumePause) }
                 },
-                playingState = playerPlayingState
+                playingState = playerPlayingState,
+                colorCalculator = colorCalculator
             )
 
             Spacer(modifier = Modifier.padding(horizontal = 8.dp))
@@ -118,7 +126,7 @@ fun PlayerController(
                 Icon(
                     imageVector = Icons.Rounded.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = colorCalculator.contentColor
                 )
             }
         }
@@ -129,6 +137,7 @@ fun PlayerController(
 fun PlayerControllerPlay(
     onClick: () -> Unit,
     playingState: PlayerPlayingState,
+    colorCalculator: ColorCalculator,
     modifier: Modifier = Modifier
 ) {
 
@@ -193,6 +202,7 @@ fun PlayerControllersPreview() {
             PlayerControllerContainer(
                 sendPlayerEvent = {},
                 playerPlayingState = PlayerPlayingState.PAUSE,
+                colorCalculator = rememberColorCalculator()
             )
         }
     }

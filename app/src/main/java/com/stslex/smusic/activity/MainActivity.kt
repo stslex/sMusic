@@ -14,8 +14,7 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.stslex.core.ui.theme.AppTheme
-import com.stslex.smusic.ui.v1.MainScreen
-import com.stslex.smusic.ui.v2.MainScreenV2
+import com.stslex.smusic.ui.MainScreen
 import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
@@ -32,7 +31,9 @@ class MainActivity : AppCompatActivity() {
             val systemUiController = rememberSystemUiController()
             val navHostController = rememberNavController()
 
-            val settingsValue by remember(viewModel) { viewModel.settings }.collectAsState()
+            val settingsValue by remember(viewModel) {
+                viewModel.settings
+            }.collectAsState()
 
             val isDarkTheme by remember {
                 derivedStateOf {
@@ -55,16 +56,9 @@ class MainActivity : AppCompatActivity() {
             AppTheme(
                 isDarkTheme = isDarkTheme
             ) {
-
-                MainScreenV2(
+                MainScreen(
                     navController = navHostController
                 )
-//                MainScreen(
-//                    navHostController = navHostController,
-//                    currentMediaItem = viewModel::currentMediaItem,
-//                    onPlayerClick = viewModel::onPlayerClick,
-//                    simpleMediaState = viewModel::simpleMediaState,
-//                )
             }
         }
     }

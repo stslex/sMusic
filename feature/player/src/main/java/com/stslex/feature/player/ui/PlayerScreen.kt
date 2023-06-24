@@ -1,7 +1,6 @@
-package com.stslex.feature.player.ui.v2
+package com.stslex.feature.player.ui
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -15,15 +14,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -33,11 +27,11 @@ import androidx.media3.common.MediaItem
 import com.stslex.core.player.model.PlayerEvent
 import com.stslex.core.player.model.SimpleMediaState
 import com.stslex.core.ui.extensions.toDp
-import com.stslex.core.ui.extensions.toPx
 import com.stslex.core.ui.theme.AppTheme
-import com.stslex.feature.player.ui.v1.components.SongCover
-import kotlinx.coroutines.launch
-import kotlin.math.abs
+import com.stslex.feature.player.ui.base.AppSwipeState
+import com.stslex.feature.player.ui.base.rememberColorCalculator
+import com.stslex.feature.player.ui.base.rememberSwipeableState
+import com.stslex.feature.player.ui.components.SongCover
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -45,34 +39,18 @@ fun PlayerScreen(
     simpleMediaState: SimpleMediaState,
     currentMediaItem: MediaItem?,
     allMediaItems: List<MediaItem>,
+    swipeableState: AppSwipeState,
     onPlayerClick: (PlayerEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val configuration = LocalConfiguration.current
-    val coroutineScope = rememberCoroutineScope()
 
-    val screenHeight = configuration.screenHeightDp.dp
     val initialHeight = 100.dp
 
-    val swipeableState = rememberSwipeableState(
-        initialValue = SwipeState.SHRINK
-    )
-
-    val swipeableOffset by remember {
-        derivedStateOf {
-            abs(swipeableState.offset.value)
-        }
-    }
-    val swipeableOffsetDp = swipeableOffset.toDp
-
-    val swipeProgress = remember(swipeableOffset) {
-        swipeableOffsetDp / screenHeight
-    }
-
-
+    val swipeableOffsetDp = swipeableState.swipeableOffset.toDp
     val colorCalculator = rememberColorCalculator()
         .apply {
-            condition = swipeProgress > .2f
+            condition = swipeableState.swipeProgress > .2f
         }
 
     LaunchedEffect(currentMediaItem?.mediaMetadata?.artworkUri) {
@@ -89,25 +67,25 @@ fun PlayerScreen(
         Box(
             modifier = modifier
                 .swipeable(
-                    state = swipeableState,
-                    anchors = mapOf(
-                        0f to SwipeState.SHRINK,
-                        -screenHeight.toPx to SwipeState.EXPAND
-                    ),
+                    state = swipeableState.state,
+                    anchors = swipeableState.anchors,
                     orientation = Orientation.Vertical
                 )
-                .height(swipeableOffset.toDp + initialHeight)
+                .height(swipeableOffsetDp + initialHeight)
                 .clickable(
-                    enabled = swipeableState.currentValue == SwipeState.SHRINK
+                    enabled = swipeableState.isShrink
                 ) {
-                    coroutineScope.launch {
-                        swipeableState.animateTo(
-                            targetValue = SwipeState.EXPAND,
-                            anim = spring(0.9f)
-                        )
-                    }
+                    swipeableState.expand()
                 }
-                .background(colorCalculator.backgroundColor)
+                .background(
+                    colorCalculator.backgroundColor.copy(
+                        alpha = if (swipeableState.swipeProgress <= .2f) {
+                            0.95f
+                        } else {
+                            swipeableState.swipeProgress
+                        }
+                    )
+                )
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
         ) {
@@ -139,11 +117,11 @@ fun PlayerScreen(
                         currentId = currentMediaItem?.mediaId.orEmpty(),
                         allMediaItems = allMediaItems,
                         sendPlayerEvent = onPlayerClick,
-                        swipeProgress = swipeProgress
+                        swipeProgress = swipeableState.swipeProgress
                     )
 
                     AnimatedVisibility(
-                        visible = swipeableState.currentValue == SwipeState.EXPAND
+                        visible = swipeableState.isExpand
                     ) {
                         PlayerExpandContent(
                             currentMediaItem = currentMediaItem,
@@ -158,7 +136,7 @@ fun PlayerScreen(
                     modifier = Modifier
                         .weight(1f)
                         .align(Alignment.CenterVertically),
-                    visible = swipeableState.currentValue == SwipeState.SHRINK
+                    visible = swipeableState.isShrink
                 ) {
                     PlayerShrinkContent(
                         currentMediaItem = currentMediaItem,
@@ -183,7 +161,8 @@ fun PlayerScreenPreview() {
                 currentMediaItem = null,
                 simpleMediaState = SimpleMediaState(),
                 allMediaItems = emptyList(),
-                onPlayerClick = {}
+                onPlayerClick = {},
+                swipeableState = rememberSwipeableState()
             )
         }
     }
