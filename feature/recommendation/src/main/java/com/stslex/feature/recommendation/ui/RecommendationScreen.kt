@@ -38,10 +38,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.stslex.core.navigation.NavigationScreen
 import com.stslex.core.ui.components.setDynamicPlaceHolder
 import com.stslex.core.ui.extensions.toDp
@@ -147,7 +150,15 @@ fun Song(
                     .onGloballyPositioned {
                         imageWidth = it.size.height
                     },
-                model = songItem.mediaMetadata.artworkUri,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(songItem.mediaMetadata.artworkUri)
+                    .placeholderMemoryCacheKey(songItem.mediaMetadata.artworkUri.toString())
+                    .memoryCacheKey(songItem.mediaMetadata.artworkUri.toString())
+                    .diskCacheKey(songItem.mediaMetadata.artworkUri.toString())
+                    .networkCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )
@@ -173,7 +184,8 @@ fun Song(
                         text = songItem.mediaMetadata.artist?.toString().orEmpty(),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
                     )
                     Spacer(modifier = Modifier.padding(4.dp))
                     Text(
@@ -185,7 +197,8 @@ fun Song(
                         text = songItem.mediaMetadata.title?.toString().orEmpty(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
                     )
                 }
             }
