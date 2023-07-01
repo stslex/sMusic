@@ -158,6 +158,7 @@ fun Song(
                     .networkCachePolicy(CachePolicy.ENABLED)
                     .diskCachePolicy(CachePolicy.ENABLED)
                     .memoryCachePolicy(CachePolicy.ENABLED)
+                    .allowHardware(false)
                     .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,

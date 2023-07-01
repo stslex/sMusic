@@ -60,89 +60,78 @@ fun PlayerScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
+            .swipeable(
+                state = swipeableState.state,
+                anchors = swipeableState.anchors,
+                orientation = Orientation.Vertical
+            )
+            .height(swipeableOffsetDp + initialHeight)
+            .clickable(
+                enabled = swipeableState.isShrink
+            ) {
+                swipeableState.expand()
+            }
+            .background(
+                colorCalculator.backgroundColor.copy(
+                    alpha = swipeableState.swipeProgress * 0.5f
+                )
+            )
+            .fillMaxWidth()
     ) {
 
-        Box(
-            modifier = modifier
-                .swipeable(
-                    state = swipeableState.state,
-                    anchors = swipeableState.anchors,
-                    orientation = Orientation.Vertical
-                )
-                .height(swipeableOffsetDp + initialHeight)
-                .clickable(
-                    enabled = swipeableState.isShrink
-                ) {
-                    swipeableState.expand()
-                }
-                .background(
-                    colorCalculator.backgroundColor.copy(
-                        alpha = if (swipeableState.swipeProgress <= .2f) {
-                            0.95f
-                        } else {
-                            swipeableState.swipeProgress
-                        }
-                    )
-                )
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
 
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .wrapContentWidth()
+                    .fillMaxHeight()
+                    .align(Alignment.Top)
             ) {
 
-                Column(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .fillMaxHeight()
-                        .align(Alignment.Top)
-                ) {
-
-                    val screenWidth = configuration.screenWidthDp.dp
-                    val swipeableOffsetHeight = swipeableOffsetDp + initialHeight
-                    val imageSize = if (swipeableOffsetHeight < screenWidth) {
-                        swipeableOffsetHeight
-                    } else {
-                        screenWidth
-                    }
-
-                    SongCover(
-                        modifier = Modifier
-                            .size(imageSize)
-                            .align(Alignment.Start),
-                        currentId = currentMediaItem?.mediaId.orEmpty(),
-                        allMediaItems = allMediaItems,
-                        sendPlayerEvent = onPlayerClick,
-                        swipeProgress = swipeableState.swipeProgress
-                    )
-
-                    AnimatedVisibility(
-                        visible = swipeableState.isExpand
-                    ) {
-                        PlayerExpandContent(
-                            currentMediaItem = currentMediaItem,
-                            simpleMediaState = simpleMediaState,
-                            onPlayerClick = onPlayerClick,
-                            colorCalculator = colorCalculator
-                        )
-                    }
+                val screenWidth = configuration.screenWidthDp.dp
+                val swipeableOffsetHeight = swipeableOffsetDp + initialHeight
+                val imageSize = if (swipeableOffsetHeight < screenWidth) {
+                    swipeableOffsetHeight
+                } else {
+                    screenWidth
                 }
 
-                AnimatedVisibility(
+                SongCover(
                     modifier = Modifier
-                        .weight(1f)
-                        .align(Alignment.CenterVertically),
-                    visible = swipeableState.isShrink
+                        .size(imageSize)
+                        .align(Alignment.Start),
+                    currentId = currentMediaItem?.mediaId.orEmpty(),
+                    allMediaItems = allMediaItems,
+                    sendPlayerEvent = onPlayerClick,
+                    swipeProgress = swipeableState.swipeProgress
+                )
+
+                AnimatedVisibility(
+                    visible = swipeableState.isExpand
                 ) {
-                    PlayerShrinkContent(
+                    PlayerExpandContent(
                         currentMediaItem = currentMediaItem,
+                        simpleMediaState = simpleMediaState,
+                        onPlayerClick = onPlayerClick,
                         colorCalculator = colorCalculator
                     )
                 }
+            }
+
+            AnimatedVisibility(
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically),
+                visible = swipeableState.isShrink
+            ) {
+                PlayerShrinkContent(
+                    currentMediaItem = currentMediaItem,
+                    colorCalculator = colorCalculator
+                )
             }
         }
     }

@@ -19,9 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.stslex.core.navigation.NavigationScreen
-import com.stslex.core.ui.theme.AppTheme
-import com.stslex.feature.player.navigation.PlayerInit
-import com.stslex.feature.player.ui.base.rememberSwipeableState
+import com.stslex.feature.player.ui.base.AppSwipeState
 import com.stslex.smusic.navigation.NavigationHost
 import com.stslex.smusic.navigation.navigate
 import com.stslex.smusic.ui.appbar.AppTopAppBar
@@ -30,13 +28,13 @@ import com.stslex.smusic.ui.appbar.AppTopAppBar
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
+    swipeableState: AppSwipeState,
     navController: NavHostController = rememberNavController(),
 ) {
     val currentDestination = navController.currentBackStackEntryAsState()
     val currentRoute by remember {
         derivedStateOf { currentDestination.value?.destination?.route.orEmpty() }
     }
-    val swipeableState = rememberSwipeableState()
 
     BackHandler(
         enabled = swipeableState.swipeProgress >= 0.1f
@@ -70,17 +68,13 @@ fun MainScreen(
                 )
             }
         }
-
-        PlayerInit(
-            swipeableState = swipeableState
-        )
     }
 }
 
 @Composable
 @Preview
 fun MainScreenPreview() {
-    AppTheme {
-        MainScreen()
-    }
+//    AppTheme {
+//        MainScreen()
+//    }
 }

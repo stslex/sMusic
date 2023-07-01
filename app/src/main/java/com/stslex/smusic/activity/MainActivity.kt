@@ -1,7 +1,8 @@
 package com.stslex.smusic.activity
 
 import android.os.Bundle
-import androidx.activity.compose.setContent
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -24,59 +25,92 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.stslex.core.ui.theme.AppTheme
+import com.stslex.feature.player.navigation.PlayerInit
+import com.stslex.feature.player.ui.base.AppSwipeState
+import com.stslex.feature.player.ui.base.rememberSwipeableState
+import com.stslex.smusic.databinding.ActivityMainBinding
 import com.stslex.smusic.ui.BlurView
 import com.stslex.smusic.ui.MainScreen
+import eightbitlab.com.blurview.RenderEffectBlur
+import eightbitlab.com.blurview.RenderScriptBlur
 import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
 
     private val viewModel by inject<MainActivityViewModel>()
+    private var _binding: ActivityMainBinding? = null
+    private val binding: ActivityMainBinding
+        get() = requireNotNull(_binding)
+
+
+    private val _swipeableState: AppSwipeState? = null
+    private val swipeableState: AppSwipeState
+        @Composable
+        get() = _swipeableState ?: rememberSwipeableState()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        setContent {
-            val isSystemDark = isSystemInDarkTheme()
-            val systemUiController = rememberSystemUiController()
-            val navHostController = rememberNavController()
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-            val settingsValue by remember(viewModel) {
-                viewModel.settings
-            }.collectAsState()
+        binding.contentComposeView.apply {
+            setLayerType(View.LAYER_TYPE_SOFTWARE, null)
 
-            val isDarkTheme by remember {
-                derivedStateOf {
-                    if (settingsValue.isSystemThemeEnable) {
-                        isSystemDark
-                    } else {
-                        settingsValue.isDarkTheme
+            setContent {
+                val isSystemDark = isSystemInDarkTheme()
+                val systemUiController = rememberSystemUiController()
+                val navHostController = rememberNavController()
+
+                val settingsValue by remember(viewModel) {
+                    viewModel.settings
+                }.collectAsState()
+
+                val isDarkTheme by remember {
+                    derivedStateOf {
+                        if (settingsValue.isSystemThemeEnable) {
+                            isSystemDark
+                        } else {
+                            settingsValue.isDarkTheme
+                        }
                     }
                 }
-            }
 
-            DisposableEffect(systemUiController, isDarkTheme) {
-                systemUiController.setSystemBarsColor(
-                    color = Color.Transparent,
-                    darkIcons = isDarkTheme.not()
-                )
-                onDispose { }
-            }
+                DisposableEffect(systemUiController, isDarkTheme) {
+                    systemUiController.setSystemBarsColor(
+                        color = Color.Transparent,
+                        darkIcons = isDarkTheme.not()
+                    )
+                    onDispose { }
+                }
 
+                AppTheme(
+                    isDarkTheme = isDarkTheme
+                ) {
 
-
-            AppTheme(
-                isDarkTheme = isDarkTheme
-            ) {
-
-                MainScreen(
-                    navController = navHostController
-                )
-
-                ExampleBlur()
+                    MainScreen(
+                        navController = navHostController,
+                        swipeableState = swipeableState
+                    )
+                }
             }
         }
+
+        binding.composeViewInsideBlurView.apply {
+            setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+            setContent {
+                PlayerInit(swipeableState = swipeableState)
+            }
+        }
+
+        binding.blurView
+            .setupWith(
+                window.decorView as ViewGroup,
+                RenderEffectBlur()
+            )
+            .setFrameClearDrawable(window.decorView.background)
+            .setBlurRadius(16f)
     }
 
     @Composable
